@@ -2,13 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running 'nixos-help').
 
-{ config, pkgs, ... }:
+{ config, pkgs, claudeDesktop, ... }:
 
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      <home-manager/nixos>
       ./steam.nix
       ./nvidia.nix
       ./obs.nix
@@ -192,15 +191,7 @@
     obsidian
     minecraft
     jdk
-    # (import (builtins.fetchTarball {
-    #   url = "https://github.com/k3d3/claude-desktop-linux-flake/archive/main.tar.gz";
-    # })).packages.${system}.claude-desktop-with-fhs
-  (import (fetchFromGitHub {
-    owner = "k3d3";
-    repo = "claude-desktop-linux-flake";
-    rev = "main"; 
-    sha256 = "sha256-Yk/7pIspgG6/7WYGNrwDmAgh96g2bQ5v/dD13kjEcSE="; 
-  })).packages.${system}.claude-desktop-with-fhs
+    claudeDesktop.packages.${pkgs.system}.claude-desktop-with-fhs
   ];
 
 

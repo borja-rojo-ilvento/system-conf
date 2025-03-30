@@ -175,6 +175,7 @@
     wget
     git
     code-cursor
+    windsurf
     discord
     xwayland
     zoxide
@@ -191,6 +192,7 @@
     obsidian
     minecraft
     jdk
+    devbox
     claudeDesktop.packages.${pkgs.system}.claude-desktop-with-fhs
   ];
 

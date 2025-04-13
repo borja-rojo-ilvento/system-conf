@@ -27,11 +27,9 @@
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.users.brojo = import ./home/brojo/home.nix;
-              
-              # Make claude-desktop available in configuration.nix
-              _module.args = {
-                claudeDesktop = claude-desktop;
-              };
+	      home-manager.extraSpecialArgs = {
+	      	inherit claude-desktop;
+	      };
             }
           ];
         };

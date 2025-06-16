@@ -7,7 +7,7 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-    ./hardware-configuration.nix
+      ./hardware-configuration.nix
       ./steam.nix
       ./nvidia.nix
       ./obs.nix
@@ -16,6 +16,8 @@
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store = true;
+      max-jobs = "auto";
+      cores = 0;
     };
     gc = {
       automatic = true;
@@ -78,27 +80,18 @@
   services.xserver = {
     enable = true;
     videoDrivers = [ "nvidia" ];
+    # Add X11-specific optimizations
+    deviceSection = ''
+    Option "TearFree" "true"
+    Option "TripleBuffer" "true"
+    '';
   };
   services.displayManager = {
     sddm = {
       enable = true;
-# Settings for multi-monitor/ dock setup
-      settings = {
-	General = {
-	  DisplayServer = "wayland";
-	  GreeterEnvironment = "QT_QPA_PLATFORM=wayland;QT_WAYLAND_SHELL_INTEGRATION=layer-shell";
-	};
-	Wayland = {
-	  CompositorCommand = "kwin_wayland --drm --no-global-shortcuts";
-	};
-	X11 = {
-	  ServerArguments = "-nolisten tcp -dpi 96";
-	  EnableHiDPI = true;
-	};
-      };
+      # Remove all Wayland settings
     };
-# autoLogin.user = "brojo";
-    defaultSession = "plasma";
+    defaultSession = "plasmax11";  # Use X11 session
   };
   services.desktopManager.plasma6 = {
     enable = true;
@@ -127,7 +120,11 @@
 
   xdg.portal = {
     enable = true;
-    extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ];
+    extraPortals = [ 
+      pkgs.kdePackages.xdg-desktop-portal-kde 
+      pkgs.xdg-desktop-portal-gtk  # Better X11 support
+    ];
+    config.common.default = "kde";
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -136,6 +133,12 @@
 
   environment.systemPackages = with pkgs; [
   ];
+  environment.variables = {
+    # Force applications to use X11
+    GDK_BACKEND = "x11";
+    QT_QPA_PLATFORM = "xcb";
+    NIXOS_OZONE_WL = "0";  # Force Electron apps to X11
+  };
 
 
   system.stateVersion = "24.05";

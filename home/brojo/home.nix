@@ -33,6 +33,10 @@ let
   };
 in
   {
+  imports = [
+    ./programs/obs.nix
+    ./programs/steam.nix
+  ];
 
   home.packages = with pkgs; [
     nix-search-cli

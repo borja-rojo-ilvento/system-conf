@@ -8,9 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./steam.nix
       ./nvidia.nix
-      ./obs.nix
     ];
   nix = {
     settings = {
@@ -106,7 +104,20 @@
     jack.enable = true;
   };
 
+  #Thread Priority for better performance
+  systemd.services.obs = {
+    serviceConfig = {
+      CPUAffinity = "6 7";  # Dedicating threads 6-7 (last physical core)
+      Nice = -10;           # Higher priority but not maximum
+    };
+  };
   programs.zsh.enable = true;
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+  };
+
   users.defaultUserShell = pkgs.zsh;
 
   users.users.brojo = {

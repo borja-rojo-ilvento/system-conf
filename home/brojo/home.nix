@@ -40,6 +40,7 @@ in
     clang
     gnumake
     cargo
+    go
     nodejs-slim
     wget
     git

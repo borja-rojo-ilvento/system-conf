@@ -8,7 +8,6 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./nvidia.nix
     ];
   nix = {
     settings = {
@@ -32,7 +31,6 @@
       powerOnBoot = true;
     };
     graphics = {
-      enable = true;
       enable32Bit = true;
     };
   };
@@ -74,10 +72,10 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+
   services.blueman.enable = true;
   services.xserver = {
     enable = true;
-    videoDrivers = [ "nvidia" ];
     # Add X11-specific optimizations
     deviceSection = ''
     Option "TearFree" "true"

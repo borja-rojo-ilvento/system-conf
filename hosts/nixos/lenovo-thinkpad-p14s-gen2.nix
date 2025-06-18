@@ -1,4 +1,4 @@
-{ nixos-hardware, lib, ... }:
+{ lib, nixos-hardware, ... }:
 {
   imports = [
     nixos-hardware.nixosModules.lenovo-thinkpad-p14s-intel-gen3

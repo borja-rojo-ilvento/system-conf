@@ -6,12 +6,12 @@
 
   hardware.nvidia = {
     prime = {
-      intelBusId = "PCI:0:2:0";
-      nvidiaBusId = "PCI:1:0:0";
+      intelBusId = lib.mkForce "PCI:0:2:0";
+      nvidiaBusId = lib.mkForce "PCI:1:0:0";
     };
-    modesetting.enable = false;  # Disable for X11
+    modesetting.enable = lib.mkForce false;  # Disable for X11
     # Force performance mode for X11
-    forceFullCompositionPipeline = true;
+    forceFullCompositionPipeline = lib.mkForce true;
   };
 
 }

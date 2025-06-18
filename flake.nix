@@ -23,8 +23,7 @@
           inherit system;
           specialArgs = { inherit nixos-hardware; };
           modules = [
-            ./hosts/nixos/configuration.nix
-            ./hosts/nixos/lenovo-thinkpad-p14s-gen2.nix
+            ./hosts/nixos
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;

@@ -1,8 +1,17 @@
-{ nixpkgs, nixos-hardware, home-manager, claude-desktop, ... }: 
+{
+  nixpkgs,
+  nixos-hardware,
+  home-manager,
+  claude-desktop,
+  ...
+}:
 
 nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
-  specialArgs = { inherit nixos-hardware home-manager claude-desktop; hostname = "jaro"; };
+  specialArgs = {
+    inherit nixos-hardware home-manager claude-desktop;
+    hostname = "jaro";
+  };
   modules = [
     # Hardware configuration
     ../../lib/hardware/machines/brojo-thinkpad-p14s-gen2
@@ -22,3 +31,4 @@ nixpkgs.lib.nixosSystem {
     }
   ];
 }
+

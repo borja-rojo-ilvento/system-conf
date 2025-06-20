@@ -1,4 +1,9 @@
-{ config, pkgs, claude-desktop, ... }:
+{
+  config,
+  pkgs,
+  claude-desktop,
+  ...
+}:
 let
   neovimConfig = {
     enable = true;
@@ -32,7 +37,7 @@ let
     vimAlias = true;
   };
 in
-  {
+{
   imports = [
     ./programs/obs.nix
     ./programs/steam.nix
@@ -54,6 +59,7 @@ in
     zoom-us
     xwayland
     zoxide
+    ripgrep
     flameshot
     fzf
     ledger-live-desktop

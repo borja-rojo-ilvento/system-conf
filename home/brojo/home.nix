@@ -105,11 +105,6 @@ in
     enableZshIntegration = true;
   };
 
-  services.ollama = {
-    enable = true;
-    acceleration = "cuda";
-  };
-
   # Uncomment if you need to set up kwallet configuration
   # xdg.configFile."kwalletrc".text = ''
   #   [Wallet]

@@ -31,6 +31,20 @@
     };
   };
 
+  # Power management for laptop
+  powerManagement = {
+    enable = true;
+    powertop.enable = true;
+  };
+
+  services.logind = {
+    lidSwitch = "suspend";
+    lidSwitchExternalPower = "suspend";
+    extraConfig = ''
+      HandlePowerKey=suspend
+    '';
+  };
+
 # Sound configuration
   security.rtkit.enable = true;
   security.pam.services = {

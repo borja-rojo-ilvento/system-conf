@@ -1,10 +1,18 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   # Nix configuration
   nix = {
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       auto-optimise-store = true;
       max-jobs = "auto";
       cores = 0;
@@ -61,4 +69,38 @@
 
   # System version
   system.stateVersion = "24.05";
+
+  services = {
+    xserver.enable = true; # Turn on the GUI (not X11 itself)
+    displayManager = {
+      sddm.enable = true;
+      defaultSession = "plasmax11"; # Use X11 session
+    };
+    desktopManager.plasma6.enable = true;
+  };
+
+  # Security services for desktop
+  security.pam.services = {
+    sddm.enableKwallet = true;
+    sddm.gnupg.enable = true;
+    login.enableKwallet = true;
+    passwd.enableKwallet = true;
+  };
+
+  # XDG portal configuration for desktop integration
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.kdePackages.xdg-desktop-portal-kde
+      pkgs.xdg-desktop-portal-gtk # Better X11 support
+    ];
+    config.common.default = "kde";
+  };
+
+  # Force applications to use X11
+  environment.variables = {
+    GDK_BACKEND = "x11";
+    QT_QPA_PLATFORM = "xcb";
+    NIXOS_OZONE_WL = "0"; # Force Electron apps to X11
+  };
 }

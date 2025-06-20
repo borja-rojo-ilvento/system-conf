@@ -8,9 +8,6 @@
       auto-optimise-store = true;
       max-jobs = "auto";
       cores = 0;
-      # Use modern setting names to avoid warnings
-      allowed-users = [ "*" ];
-      trusted-users = [ "root" ];
     };
     gc = {
       automatic = true;

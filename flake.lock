@@ -61,15 +61,16 @@
     },
     "nixos-hardware": {
       "locked": {
-        "lastModified": 1750083401,
-        "narHash": "sha256-ynqbgIYrg7P1fAKYqe8I/PMiLABBcNDYG9YaAP/d/C4=",
-        "owner": "nixos",
+        "lastModified": 1750437894,
+        "narHash": "sha256-/k9sA96hId/LoEAigZWI0j0H4gDaSicV4hhzqNoVVAQ=",
+        "owner": "borja-rojo-ilvento",
         "repo": "nixos-hardware",
-        "rev": "61837d2a33ccc1582c5fabb7bf9130d39fee59ad",
+        "rev": "63169227bd35960739da225f48b68bf503bac098",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
+        "owner": "borja-rojo-ilvento",
+        "ref": "lenovo-thinkpad-p14s-intel-gen2",
         "repo": "nixos-hardware",
         "type": "github"
       }

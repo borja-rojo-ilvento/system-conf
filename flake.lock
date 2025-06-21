@@ -61,11 +61,11 @@
     },
     "nixos-hardware": {
       "locked": {
-        "lastModified": 1750530162,
-        "narHash": "sha256-Yt++4AZe2D+ZirXyGzq1cfE0pWIrMwMJOxVJdRbVJBU=",
+        "lastModified": 1750534983,
+        "narHash": "sha256-Sm4cunWrsL0VHpnB7tkf7LgJCBmmUOeH14WeqPIcuAQ=",
         "owner": "borja-rojo-ilvento",
         "repo": "nixos-hardware",
-        "rev": "2f54d4bb2c644f913d78a80d8c84830df22296f5",
+        "rev": "73cc81004c14adcf66833118e28a7a865e73bb8d",
         "type": "github"
       },
       "original": {

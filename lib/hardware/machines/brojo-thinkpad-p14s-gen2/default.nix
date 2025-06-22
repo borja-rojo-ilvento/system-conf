@@ -20,9 +20,20 @@
   ];
 
   hardware = {
+    enableAllFirmware = true;
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
     bluetooth = {
       enable = true;
       powerOnBoot = true;
     };
+  };
+
+  services.logind = {
+    lidSwitch = "suspend-then-hibernate";
+    lidSwitchExternalPower = "lock";
+    powerKey = "suspend";
   };
 }

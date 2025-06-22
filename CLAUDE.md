@@ -42,7 +42,7 @@ The system uses `specialArgs` to pass custom parameters like hostname to modules
 
 ```nix
 specialArgs = {
-  inherit nixos-hardware home-manager claude-desktop;
+  inherit nixos-hardware home-manager;
   hostname = "jaro";
 };
 ```

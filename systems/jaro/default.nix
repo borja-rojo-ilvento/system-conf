@@ -2,14 +2,13 @@
   nixpkgs,
   nixos-hardware,
   home-manager,
-  claude-desktop,
   ...
 }:
 
 nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
   specialArgs = {
-    inherit nixos-hardware home-manager claude-desktop;
+    inherit nixos-hardware home-manager;
     hostname = "jaro";
   };
   modules = [
@@ -25,10 +24,6 @@ nixpkgs.lib.nixosSystem {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.users.brojo = import ../../lib/users/brojo/home.nix;
-      home-manager.extraSpecialArgs = {
-        inherit claude-desktop;
-      };
     }
   ];
 }
-

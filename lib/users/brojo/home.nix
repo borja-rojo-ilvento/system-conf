@@ -3,43 +3,9 @@
   claude-desktop,
   ...
 }:
-let
-  neovimConfig = {
-    enable = true;
-    extraPackages = with pkgs; [
-      python3
-      git
-      gnumake
-      rustup
-      unzip
-      lua51Packages.lua
-      luarocks
-      ripgrep
-      fd
-      clang
-      tree-sitter
-      lua-language-server
-      rust-analyzer
-      ruff
-      nil
-      fzf
-      claude-code
-    ];
-    # plugins = with pkgs.vimPlugins; [
-    #   lazy-nvim
-    # ];
-    # extraConfig = ''
-    #   require("config.lazy")
-    #   '';
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-  };
-in
 {
   imports = [
-    ./programs/obs.nix
-    ./programs/steam.nix
+    ./programs
   ];
 
   home.packages = with pkgs; [
@@ -85,7 +51,6 @@ in
     claude-code
   ];
 
-  programs.neovim = neovimConfig;
   programs.git = {
     enable = true;
     userName = "Borja Rojo Ilvento";

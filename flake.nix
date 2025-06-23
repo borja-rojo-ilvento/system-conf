@@ -8,21 +8,43 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    brojo = {
-      url = "./lib/users/brojo";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # claude-desktop = {
-    #   url = "github:k3d3/claude-desktop-linux-flake";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    dotfiles.url = "github:borja-rojo-ilvento/dotfiles";
   };
 
   outputs =
-    { self, ... }@inputs:
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      dotfiles,
+      ...
+    }@inputs:
     {
       nixosConfigurations = {
-        jaro = import ./systems/jaro inputs;
+        jaro = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            inherit (inputs) nixos-hardware home-manager dotfiles;
+          };
+          modules = [
+            # Hardware configuration
+            ./lib/hardware/machines/brojo-thinkpad-p14s-gen2
+
+            # Host type configuration
+            (import ./lib/hosts { hostname = "jaro"; })
+
+            # Home manager
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.brojo = import ./lib/users/brojo/home.nix;
+              home-manager.extraSpecialArgs = {
+                inherit dotfiles;
+              };
+            }
+          ];
+        };
       };
     };
 }

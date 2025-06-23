@@ -1,8 +1,10 @@
 {
+  hostname ? "default",
+}:
+{
   config,
   lib,
   pkgs,
-  hostname ? "default",
   ...
 }:
 
@@ -48,4 +50,3 @@
     ];
   };
 }
-

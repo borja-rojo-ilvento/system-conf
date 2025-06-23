@@ -1,15 +1,12 @@
 {
-  nixpkgs,
+  pkgs,
   dotfiles,
   ...
 }:
-let
-  pkgs = nixpkgs;
-in
 {
   imports = [
     ./programs
-    dotfiles.nixosModules.default
+    dotfiles.nixosModules.x86_64-linux.default
   ];
 
   home.packages = with pkgs; [

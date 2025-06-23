@@ -16,14 +16,21 @@
       ...
     }@inputs:
     let
-      homeConfig = import ./home.nix inputs;
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems f;
     in
-    {
-      nixosModules.default = homeConfig;
-
-      homeConfigurations.brojo = home-manager.lib.homeConfigurations {
-        inherit nixpkgs;
-        modules = [ homeConfig ];
-      };
-    };
+    forAllSystems (system: 
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        homeConfig = import ./home.nix { inherit pkgs dotfiles; };
+      in
+      {
+        nixosModules.default = homeConfig;
+        
+        homeConfigurations.brojo = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [ homeConfig ];
+        };
+      }
+    );
 }

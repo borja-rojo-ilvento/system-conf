@@ -4,7 +4,9 @@
   home-manager,
   ...
 }:
-
+let
+  brojo = builtins.getFlake "path:./lib/users/brojo";
+in
 nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
   specialArgs = {
@@ -23,7 +25,7 @@ nixpkgs.lib.nixosSystem {
     {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.users.brojo = import ../../lib/users/brojo/home.nix;
+      home-manager.users.brojo = brojo.nixosModules.default;
     }
   ];
 }

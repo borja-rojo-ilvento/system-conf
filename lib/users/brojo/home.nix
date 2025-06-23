@@ -1,10 +1,13 @@
 {
   pkgs,
+  lib,
+  dotfiles,
   ...
 }:
 {
   imports = [
     ./programs
+    dotfiles.nixosModules.default
   ];
 
   home.packages = with pkgs; [

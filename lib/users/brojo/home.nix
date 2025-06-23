@@ -1,9 +1,11 @@
 {
-  pkgs,
-  lib,
+  nixpkgs,
   dotfiles,
   ...
 }:
+let
+  pkgs = nixpkgs;
+in
 {
   imports = [
     ./programs

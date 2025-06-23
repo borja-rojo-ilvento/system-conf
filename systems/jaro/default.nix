@@ -2,11 +2,9 @@
   nixpkgs,
   nixos-hardware,
   home-manager,
+  brojo,
   ...
 }:
-let
-  brojo = builtins.getFlake "path:./lib/users/brojo";
-in
 nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
   specialArgs = {

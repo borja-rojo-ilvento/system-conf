@@ -9,7 +9,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     brojo = {
-      url = ".lib/users/brojo";
+      url = "./lib/users/brojo";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # claude-desktop = {

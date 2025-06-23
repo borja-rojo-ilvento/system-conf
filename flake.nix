@@ -8,7 +8,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    dotfiles.url = "github:borja-rojo-ilvento/dotfiles";
   };
 
   outputs =
@@ -16,7 +15,6 @@
       self,
       nixpkgs,
       home-manager,
-      dotfiles,
       ...
     }@inputs:
     {
@@ -24,7 +22,7 @@
         jaro = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = {
-            inherit (inputs) nixos-hardware home-manager dotfiles;
+            inherit (inputs) nixos-hardware home-manager;
           };
           modules = [
             # Hardware configuration
@@ -39,9 +37,6 @@
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.users.brojo = import ./lib/users/brojo/home.nix;
-              home-manager.extraSpecialArgs = {
-                inherit dotfiles;
-              };
             }
           ];
         };

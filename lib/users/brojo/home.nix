@@ -46,6 +46,7 @@
     tree
     ani-cli
     claude-code
+    godot
   ];
 
   programs.git = {

@@ -14,9 +14,9 @@
       home-manager,
       dotfiles,
       ...
-    }@inputs :
+    }@inputs:
     let
-      homeConfig = import ./home.nix { inputs };
+      homeConfig = import ./home.nix inputs;
     in
     {
       nixosModules.default = homeConfig;

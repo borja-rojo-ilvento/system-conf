@@ -5,11 +5,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1750647214,
-        "narHash": "sha256-MdUjxHBAfNS6i2fhRBR4F05uhyZwPrdAoLVT1vS+Lss=",
+        "lastModified": 1750648502,
+        "narHash": "sha256-j4ISox0m5MtDW7GtO3YI67pvCKt4fuVuOgDTmtOYyEg=",
         "owner": "borja-rojo-ilvento",
         "repo": "dotfiles",
-        "rev": "b11bb64401a94b78da4401dca68d8fc9b3b25e71",
+        "rev": "92589c3da33bef6e44b47770d6c8671428b17aee",
         "type": "github"
       },
       "original": {

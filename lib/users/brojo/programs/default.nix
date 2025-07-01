@@ -2,7 +2,7 @@
 {
   imports = [
     ./obs.nix
-    ./steam.nix
+    # ./steam.nix
     ./neovim.nix
   ];
 }

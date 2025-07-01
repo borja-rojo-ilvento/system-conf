@@ -47,6 +47,10 @@
     ani-cli
     claude-code
     godot
+    bat
+    pandoc
+    texliveTeTeX
+    texlivePackages.sectsty
   ];
 
   programs.git = {

@@ -7,7 +7,7 @@
       exec = "${steam-run}/bin/steam-run ${steam}/bin/steam";
       icon = "steam";
       desktopName = "Steam (FHS)";
-      categories = ["Game"];
+      categories = [ "Game" ];
     })
   ];
 }

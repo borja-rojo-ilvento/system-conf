@@ -20,14 +20,28 @@
   # Productivity host services
   services.udev.packages = [ pkgs.ledger-udev-rules ];
 
+  xdg.portal.enable = true;
+  services.flatpak.enable = true;
+  systemd.services.flatpak-repo = {
+    wantedBy = [ "multi-user.target" ];
+    path = [ pkgs.flatpak ];
+    script = ''
+      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    '';
+  };
+
   # Gaming configuration
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-    extraCompatPackages = with pkgs; [
-      proton-ge-bin
-    ];
+  programs = {
+    steam = {
+      enable = true;
+      remotePlay.openFirewall = true;
+      dedicatedServer.openFirewall = true;
+      extraCompatPackages = with pkgs; [
+        proton-ge-bin
+      ];
+      gamescopeSession.enable = true;
+    };
+    gamemode.enable = true;
   };
 
   # Performance optimization for OBS

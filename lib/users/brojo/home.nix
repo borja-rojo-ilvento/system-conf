@@ -14,7 +14,7 @@
     gnumake
     cargo
     go
-    nodejs-slim
+    nodejs
     wget
     git
     code-cursor
@@ -51,31 +51,12 @@
     pandoc
     texliveTeTeX
     texlivePackages.sectsty
+    libnotify
+    gh
+    gemini-cli
+    eza
+    audacity
   ];
-
-  programs.git = {
-    enable = true;
-    userName = "Borja Rojo Ilvento";
-    userEmail = "borja.rojo@gmail.com";
-  };
-  programs.zsh = {
-    enable = true;
-    oh-my-zsh = {
-      enable = true;
-      theme = "alanpeabody";
-      plugins = [
-        "git"
-        "fzf"
-        "zoxide"
-        "direnv"
-      ];
-    };
-  };
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-    enableZshIntegration = true;
-  };
 
   home.stateVersion = "24.11";
 }

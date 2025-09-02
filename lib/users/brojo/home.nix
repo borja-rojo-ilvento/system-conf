@@ -19,6 +19,7 @@
     git
     code-cursor
     discord
+    equibop
     zoom-us
     xwayland
     zoxide

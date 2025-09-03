@@ -64,8 +64,13 @@
   services.printing.enable = true;
 
   # Nixpkgs configuration
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.allowBroken = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+    allowBroken = true;
+    permittedInsecurePackages = [
+      "qtwebengine-5.15.19"
+    ];
+  };
 
   # System version
   system.stateVersion = "24.05";

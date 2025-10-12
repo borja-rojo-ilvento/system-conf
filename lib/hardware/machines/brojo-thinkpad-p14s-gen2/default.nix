@@ -31,9 +31,9 @@
     };
   };
 
-  services.logind = {
-    lidSwitch = "suspend-then-hibernate";
-    lidSwitchExternalPower = "lock";
-    powerKey = "suspend";
+  services.logind.settings.Login = {
+    HandleLidSwtich = "suspend-then-hibernate";
+    HandleLidSwitchExternalPower = "lock";
+    HandlePowerKey = "suspend";
   };
 }

@@ -13,13 +13,14 @@
     clang
     gnumake
     cargo
+    rustc
+    rustfmt
     go
     nodejs
     wget
     git
     code-cursor
     discord
-    equibop
     zoom-us
     xwayland
     zoxide
@@ -35,7 +36,6 @@
     google-chrome
     stremio
     obsidian
-    minecraft
     jdk
     devbox
     ghostty

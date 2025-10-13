@@ -8,6 +8,7 @@
   ];
 
   home.packages = with pkgs; [
+    # stremio # Takes WAY too long to build.
     nix-search-cli
     firefox
     clang
@@ -29,16 +30,15 @@
     fzf
     ledger-live-desktop
     ledger-udev-rules
+    ghostty
     kdePackages.kscreen
     home-manager
     nmap
     arp-scan
     google-chrome
-    stremio
     obsidian
     jdk
     devbox
-    ghostty
     stow
     pkg-config
     openssl
@@ -57,6 +57,7 @@
     gemini-cli
     eza
     audacity
+    claude-code
   ];
 
   home.stateVersion = "24.11";

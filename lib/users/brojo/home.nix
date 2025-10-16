@@ -58,6 +58,10 @@
     eza
     audacity
     claude-code
+    freerdp
+    remmina
+    mesa-demos
+    jq
   ];
 
   home.stateVersion = "24.11";

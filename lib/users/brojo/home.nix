@@ -21,7 +21,6 @@
     wget
     git
     code-cursor
-    discord
     zoom-us
     xwayland
     zoxide

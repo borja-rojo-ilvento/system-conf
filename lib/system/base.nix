@@ -67,9 +67,6 @@
   nixpkgs.config = {
     allowUnfree = true;
     allowBroken = true;
-    permittedInsecurePackages = [
-      "qtwebengine-5.15.19"
-    ];
   };
 
   # System version
@@ -78,8 +75,10 @@
   services = {
     xserver.enable = true; # Turn on the GUI (not X11 itself)
     displayManager = {
-      sddm.enable = true;
-      defaultSession = "plasmax11"; # Use X11 session
+      sddm = {
+        enable = true;
+        wayland.enable = true;
+      };
     };
     desktopManager.plasma6.enable = true;
   };
@@ -97,15 +96,8 @@
     enable = true;
     extraPortals = [
       pkgs.kdePackages.xdg-desktop-portal-kde
-      pkgs.xdg-desktop-portal-gtk # Better X11 support
     ];
     config.common.default = "kde";
   };
 
-  # Force applications to use X11
-  environment.variables = {
-    GDK_BACKEND = "x11";
-    QT_QPA_PLATFORM = "xcb";
-    NIXOS_OZONE_WL = "0"; # Force Electron apps to X11
-  };
 }

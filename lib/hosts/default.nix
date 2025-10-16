@@ -21,17 +21,8 @@
   services.udev.packages = [ pkgs.ledger-udev-rules ];
 
   xdg.portal.enable = true;
-  services = {
-    flatpak.enable = true;
-    xserver.enable = true;
-    displayManager.sddm.enable = true;
-    desktopManager.plasma6.enable = true;
-    xrdp = {
-      defaultWindowManager = "startplasma-x11";
-      openFirewall = true;
-    };
-  };
-  # xrdp setup
+  services.flatpak.enable = true;
+
   systemd.services.flatpak-repo = {
     wantedBy = [ "multi-user.target" ];
     path = [ pkgs.flatpak ];

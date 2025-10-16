@@ -4,6 +4,7 @@
     ./obs.nix
     ./steam.nix
     ./neovim.nix
+    ./discord.nix
   ];
 
   config = {

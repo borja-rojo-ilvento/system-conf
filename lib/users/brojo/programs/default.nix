@@ -5,7 +5,7 @@
     ./steam.nix
     ./neovim.nix
     ./discord.nix
-    ./hyperland.nix
+    ./hyprland.nix
   ];
 
   config = {

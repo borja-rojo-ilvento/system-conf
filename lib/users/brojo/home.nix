@@ -61,6 +61,7 @@
     remmina
     mesa-demos
     jq
+    vscode
   ];
 
   home.stateVersion = "24.11";

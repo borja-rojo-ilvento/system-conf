@@ -31,6 +31,12 @@
     '';
   };
 
+  # Hyprland window manager
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+  };
+
   # Gaming configuration
   programs = {
     steam = {

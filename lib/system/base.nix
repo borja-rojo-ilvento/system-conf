@@ -16,6 +16,9 @@
       auto-optimise-store = true;
       max-jobs = "auto";
       cores = 0;
+      substituters = [ "https://hyprland.cachix.org" ];
+      trusted-substituters = [ "https://hyprland.cachix.org" ];
+      trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
     };
     gc = {
       automatic = true;
@@ -96,8 +99,9 @@
     enable = true;
     extraPortals = [
       pkgs.kdePackages.xdg-desktop-portal-kde
+      pkgs.xdg-desktop-portal-hyprland
     ];
-    config.common.default = "kde";
+    config.common.default = "hyprland";
   };
 
 }

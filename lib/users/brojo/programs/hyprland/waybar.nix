@@ -1,124 +1,245 @@
 { config, pkgs, ... }:
 {
+  home.packages = with pkgs; [
+    networkmanagerapplet
+    nerd-fonts.jetbrains-mono
+  ];
   programs.waybar = {
     enable = true;
     settings = {
       mainBar = {
         layer = "top";
         position = "top";
+        margin-left = 4;
+        margin-right = 4;
+        margin-top = 4;
+        margin-bottom = 0;
+        spacing = 1;
+        reload_style_on_change = true;
+
         modules-left = [
           "hyprland/workspaces"
-        ];
-        modules-center = [
           "hyprland/window"
         ];
+
+        modules-center = [ ];
+
         modules-right = [
-          "tray"
           "network"
-          "pulseaudio"
+          "backlight"
+          "wireplumber"
+          "battery"
           "clock"
         ];
 
         "hyprland/workspaces" = {
-          format = "{name}";
+          format = "{icon}";
+          all-outputs = false;
+          on-click = "activate";
+          persistent-workspaces = {
+            "*" = [
+              1
+              2
+              3
+              4
+              5
+              6
+              7
+              8
+              9
+            ];
+          };
+          format-icons = {
+            "1" = "●";
+            "2" = "●";
+            "3" = "●";
+            "4" = "●";
+            "5" = "●";
+            "6" = "●";
+            "7" = "●";
+            "8" = "●";
+            "9" = "●";
+            "active" = "●";
+            "default" = "●";
+          };
         };
 
         "hyprland/window" = {
-          max-length = 250;
-        };
-
-        tray = {
-          icon-size = 18;
-          spacing = 8;
+          format = "{title}";
         };
 
         network = {
-          format = "󰤨 {essid}";
-          format-disconnected = "󰤯";
-          on-click = "nm-applet --indicator";
-          tooltip-format = "Interface: {ifname}";
+          interval = 1;
+          format-wifi = "{essid}";
+          format-ethernet = "󰈀 Ethernet";
+          tooltip-format-ethernet = "󰈀 {ipaddr}";
+          tooltip-format-wifi = "{essid} ({signalStrength}%)";
+          tooltip-format = "󰤯 {ifname} via {gwaddr}";
+          format-linked = "󰀦 {ifname} (No IP)";
+          format-disconnected = "󰀦 Disconnected";
+          format-alt = "{ifname}: {gwaddr}/{cidr}";
         };
 
-        pulseaudio = {
+        backlight = {
+          format = "{icon} {percent}%";
+          format-icons = [
+            ""
+            ""
+            ""
+            ""
+            ""
+            ""
+            ""
+            ""
+            ""
+          ];
+        };
+
+        wireplumber = {
           format = "{icon} {volume}%";
-          format-muted = "󰝟 Muted";
-          format-icons = {
-            headphone = "󰋋";
-            hands-free = "󱡒";
-            headset = "󰋎";
-            phone = "󰏲";
-            portable = "󰏲";
-            car = "󰄎";
-            default = [
-              "󰕿"
-              "󰖀"
-              "󰕾"
-            ];
-          };
+          format-muted = "󰖁 {volume}%";
+          format-icons = [
+            ""
+            ""
+            ""
+          ];
           on-click = "pavucontrol";
         };
 
+        battery = {
+          format = "{icon} {capacity}%";
+          format-alt = "{icon} {time}";
+          format-icons = [
+            ""
+            ""
+            ""
+            ""
+            ""
+          ];
+          interval = 2;
+        };
+
         clock = {
-          format = "󰃰 {:%I:%M %p}";
-          tooltip-format = "{:%A, %B %d, %Y}";
+          interval = 60;
+          format = "{:%I:%M %p}";
+          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+          format-alt = "{:%a %b %d}";
         };
       };
     };
     style = ''
       * {
-        font-family: "monospace";
-        font-size: 13px;
+        min-height: 0;
+        font-family: "JetBrainsMono Nerd Font", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 1rem;
+        margin: 0;
+        padding: 0;
       }
 
       window#waybar {
-        background-color: #1e1e2e;
-        color: #cdd6f4;
-        border-bottom: 3px solid #313244;
+        color: #ebdbb2;
+        background-color: transparent;
+        background: none;
+        border: none;
+      }
+
+      #window,
+      #workspaces {
+        color: #ebdbb2;
+        background-color: #282828;
+        border: 0.1rem solid #504945;
+        border-radius: 0.5rem;
+        padding: 0.1rem 0.5rem;
+        margin: 0.1rem;
       }
 
       #workspaces button {
-        padding: 5px 10px;
-        margin: 5px 2px;
-        border-radius: 5px;
-        background-color: #313244;
-        color: #cdd6f4;
-        transition: all 0.3s ease;
+        color: #504945;
+        background-color: transparent;
+        border: 0rem;
+        padding: 0.1rem 0.3rem;
+        margin: 0.1rem;
+        box-shadow: none;
+      }
+
+      #workspaces button:hover,
+      #workspaces button:focus,
+      #workspaces button:active {
+        background-color: transparent;
+        box-shadow: none;
+        color: #504945;
       }
 
       #workspaces button.active {
-        background-color: #a6e3a1;
-        color: #1e1e2e;
+        color: #d79921;
       }
 
-      #workspaces button:hover {
-        background-color: #45475a;
+      #workspaces button.active:hover,
+      #workspaces button.active:focus,
+      #workspaces button.active:active {
+        background-color: transparent;
+        box-shadow: none;
+        color: #d79921;
+      }
+
+      /* Occupied but not active - requires custom module or script to distinguish */
+      /* #workspaces button.occupied:not(.active) {
+        color: #d79921;
+      } */
+
+      #clock,
+      #battery,
+      #backlight,
+      #network,
+      #wireplumber {
+        color: #282828;
+        background-color: #282828;
+        border: 0.1rem solid #504945;
+        border-radius: 0.5rem;
+        padding: 0.1rem 0.5rem;
+        margin: 0.1rem;
+      }
+
+      #network {
+        background-color: #458588;
+        color: #ebdbb2;
+      }
+
+      #backlight {
+        background-color: #d79921;
+        color: #282828;
+      }
+
+      #wireplumber {
+        background-color: #b8bb26;
+        color: #282828;
+      }
+
+      #battery {
+        background-color: #98971a;
+        color: #282828;
+      }
+
+      #clock {
+        background-color: #458588;
+        color: #ebdbb2;
       }
 
       #window {
-        padding: 0 10px;
-        margin: 0 5px;
+        background-color: #689d6a;
+        color: #282828;
       }
 
-      #tray {
-        padding: 5px 10px;
-        margin: 5px 2px;
+      #network.disconnected,
+      #wireplumber.muted {
+        background-color: #cc241d;
+        color: #ebdbb2;
       }
 
-      #network,
-      #pulseaudio,
-      #clock {
-        padding: 5px 10px;
-        margin: 5px 2px;
-        background-color: #313244;
-        border-radius: 5px;
-      }
-
-      #network.disconnected {
-        color: #f38ba8;
-      }
-
-      #pulseaudio.muted {
-        color: #f38ba8;
+      #battery.charging,
+      #battery.plugged {
+        background-color: #b8bb26;
+        color: #282828;
       }
     '';
   };

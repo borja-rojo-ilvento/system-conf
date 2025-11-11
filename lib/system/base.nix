@@ -6,6 +6,10 @@
 }:
 
 {
+  imports = [
+    ./hyprpolkitagent.nix
+  ];
+
   # Nix configuration
   nix = {
     settings = {
@@ -103,5 +107,11 @@
     ];
     config.common.default = "hyprland";
   };
+
+  # D-Bus session management (enabled by default with desktop environment)
+  services.dbus.enable = true;
+
+  # Polkit for privilege escalation
+  security.polkit.enable = true;
 
 }

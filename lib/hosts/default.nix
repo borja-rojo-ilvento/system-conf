@@ -37,6 +37,13 @@
     withUWSM = true;
   };
 
+  # NetworkManager credential storage
+  networking.networkmanager.settings = {
+    "main" = {
+      auth-polkit = "yes";
+    };
+  };
+
   # Gaming configuration
   programs = {
     steam = {

@@ -5,6 +5,7 @@
     ./steam.nix
     ./neovim.nix
     ./discord.nix
+    ./dunst.nix
     ./hyprland
   ];
 
@@ -36,6 +37,10 @@
             "direnv"
           ];
         };
+        initExtra = ''
+          fpath=(/home/brojo/.zsh/completions $fpath)
+          autoload -Uz compinit && compinit
+        '';
       };
 
       direnv = {

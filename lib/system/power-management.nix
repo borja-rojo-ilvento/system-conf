@@ -41,8 +41,10 @@
   services.thermald.enable = true;
 
   # Screen blanking and DPMS
+  services.displayManager.logToFile = true;
+
+  # X Server DPMS configuration (if X is used)
   services.xserver = {
-    displayManager.job.logToFile = true;
     # DPMS (Display Power Management Signaling)
     serverFlagsSection = ''
       Option "BlankTime" "0"

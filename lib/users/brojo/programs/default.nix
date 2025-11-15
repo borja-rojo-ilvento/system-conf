@@ -10,6 +10,7 @@
     ./hyprland
     ./theming.nix
     ./power-management.nix
+    ./development.nix
   ];
 
   config = {

@@ -1,9 +1,10 @@
 ---
 id: task-017
 title: Research terminal-based alternatives to desktop applications
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2025-11-15 04:39'
+updated_date: '2025-11-15 04:40'
 labels:
   - research
   - tooling

@@ -8,6 +8,7 @@
 {
   imports = [
     ./hyprpolkitagent.nix
+    ./hyprland
   ];
 
   # Nix configuration

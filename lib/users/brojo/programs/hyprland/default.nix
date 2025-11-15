@@ -17,7 +17,24 @@
   wayland.windowManager.hyprland.settings = {
     "$mod" = "SUPER";
     input = {
+      kb_layout = "us";
+      kb_variant = "qwerty";
       kb_options = "caps:ctrl_modifier";
+      repeat_rate = 50;
+      repeat_delay = 200;
+
+      sensitivity = 0.5;
+      follow_mouse = 2;
+
+      touchpad = {
+        natural_scroll = false;
+        clickfinger_behavior = true;
+        disable_while_typing = true;
+        tap-to-click = false;
+        tap-and-drag = false;
+        middle_button_emulation = false;
+        scroll_factor = 1.0;
+      };
     };
     animations = {
       enabled = true;
@@ -71,11 +88,15 @@
       resize_on_border = false;
       allow_tearing = false;
     };
+    decoration = {
+      # Light window rounding to soften sharp edges
+      rounding = 5;
+    };
     master = {
       # Master window takes 60% of screen width
       mfact = 0.60;
 
-      # Master on left, slaves on right
+      # Master on left, slaves on right (can cycle with $mod CTRL Space)
       orientation = "left";
 
       # New windows become master focus
@@ -89,6 +110,10 @@
 
       # Don't drop windows at cursor when dragging
       drop_at_cursor = false;
+
+      # Center orientation configuration
+      # Master always centered (regardless of slave count)
+      slave_count_for_center_master = 0;
     };
     bind = [
       "$mod, F, exec, firefox"
@@ -104,6 +129,19 @@
       "$mod SHIFT, j, layoutmsg, swapnext"
       "$mod SHIFT, k, layoutmsg, swapprev"
       "$mod SHIFT, h, layoutmsg, swapwithmaster master"
+
+      # Cycle master layout orientation
+      "$mod CTRL, Space, layoutmsg, orientationcycle left center"
+
+      # Audio control via wpctl (volume)
+      ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
+      ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+      ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+
+      # Media control via playerctl
+      ", XF86AudioPlay, exec, playerctl play-pause"
+      ", XF86AudioNext, exec, playerctl next"
+      ", XF86AudioPrev, exec, playerctl previous"
     ]
     ++ (
       # workspaces

@@ -62,6 +62,9 @@
     mesa-demos
     jq
     vscode
+    # Audio control
+    wireplumber
+    playerctl
   ];
 
   home.stateVersion = "24.11";

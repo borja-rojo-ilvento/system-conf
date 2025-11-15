@@ -11,6 +11,7 @@
     ./power-management.nix
     ./development.nix
     ./input-method.nix
+    ./ghostty.nix
   ];
 
   config = {

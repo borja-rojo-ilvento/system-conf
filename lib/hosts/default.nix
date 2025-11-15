@@ -44,10 +44,16 @@
     };
   };
 
-  # NetworkManager WiFi profiles
-  networking.networkmanager.ensureProfiles.profiles = {
-    "jean.net" = import ../system/wifi-profiles/jean.net.nix;
-  };
+  # WiFi auto-connect configuration
+  # The WiFi profile is not declaratively managed via ensureProfiles to allow
+  # the user to enter and securely store the password once without it being
+  # overwritten on each boot. The connection persists in NetworkManager's
+  # system-connections directory after manual setup.
+  #
+  # To set up jean.net WiFi:
+  # 1. Run: nmcli device wifi connect jean.net password <password>
+  # 2. Or use: nmcli connection add type wifi con-name jean.net ssid jean.net
+  # 3. The connection will auto-connect on subsequent logins
 
   # Gaming configuration
   programs = {

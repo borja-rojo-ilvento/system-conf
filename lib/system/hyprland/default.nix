@@ -19,5 +19,13 @@
   # Essential packages for Hyprland functionality
   environment.systemPackages = with pkgs; [
     hyprland
+    kdePackages.kwallet
+    kdePackages.kwallet-pam
+    kdePackages.kwalletmanager
   ];
+
+  # PAM integration for automatic KWallet unlock
+  security.pam.services = {
+    login.enableKwallet = true;
+  };
 }

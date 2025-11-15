@@ -1,4 +1,8 @@
 { config, pkgs, ... }:
+let
+  firefox-client-class = "firefox";
+  ghostty-client-class = "com.mitchellh.ghostty";
+in
 {
   imports = [
     ./waybar.nix
@@ -129,8 +133,8 @@
     ];
     windowrulev2 = [
       # Workspace assignments by use case
-      "workspace 1, class:^(firefox)$"
-      "workspace 2, class:^(ghostty|foot|kitty)$"
+      "workspace 1, class:^(${firefox-client-class})$"
+      "workspace 2, class:^(${ghostty-client-class})$"
       "workspace 3, class:^(discord)$"
       "workspace 4, class:^(steam)$"
       "workspace 5, class:^(obs)$"
@@ -225,6 +229,7 @@
     exec-once = [
       "nm-applet --indicator"
       "waybar"
+      "kwalletd6"
     ];
   };
 }

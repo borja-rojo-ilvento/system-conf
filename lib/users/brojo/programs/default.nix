@@ -8,7 +8,6 @@
     ./dunst.nix
     ./rofi
     ./hyprland
-    ./theming.nix
     ./power-management.nix
     ./development.nix
     ./input-method.nix

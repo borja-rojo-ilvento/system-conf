@@ -166,11 +166,8 @@
       "float, class:^([Ss]ystem.*[Ss]etting)"
       "center, class:^([Ss]ystem.*[Ss]etting)"
 
-      # Sticky windows (always visible)
-      "sticky, title:^(Picture-in-Picture)"
-
-      # Opacity for inactive windows
-      "opacity 0.85 0.90, activewindow:0"
+      # Picture-in-Picture windows - floating
+      "float, title:^(Picture-in-Picture)"
     ];
 
     windowrule = [

@@ -44,7 +44,6 @@
         foreground = "#888888";
         frame_color = "#444444";
         timeout = 4;
-        sound = "complete";
       };
 
       urgency_normal = {
@@ -52,7 +51,6 @@
         foreground = "#ffffff";
         frame_color = "#407294";
         timeout = 6;
-        sound = "message";
       };
 
       urgency_critical = {
@@ -60,7 +58,6 @@
         foreground = "#ffffff";
         frame_color = "#ff0000";
         timeout = 0;
-        sound = "alarm-clock-elapsed";
       };
     };
   };

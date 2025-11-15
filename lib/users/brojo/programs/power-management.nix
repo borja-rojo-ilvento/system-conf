@@ -81,10 +81,6 @@
     iotop
     powertop
     lm_sensors
-    psutil
-
-    # GPU monitoring
-    gpu-monitor-tools
 
     # System information
     neofetch

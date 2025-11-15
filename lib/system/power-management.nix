@@ -13,24 +13,23 @@
   # TLP for advanced battery management (alternative to power-profiles-daemon)
   # services.tlp.enable = true;
 
-  # Sleep and suspend behavior
-  services.logind.extraConfig = ''
-      # Screen blanking timeout (in seconds) - 5 minutes
-      IdleAction=suspend
-      IdleActionSec=600
-
-      # Close lid action
-      HandleLidSwitch=suspend
-      HandleLidSwitchExternalPower=suspend
-      HandleLidSwitchDocked=ignore
-
-      # Power button action
-      HandlePowerKey=poweroff
-      HandlePowerKeyLongPress=ignore
-
+  # Sleep and suspend behavior (with defaults that can be overridden by hardware)
+  services.logind.settings = {
+    Login = {
+      # Screen blanking timeout (in seconds) - 10 minutes
+      IdleAction = lib.mkDefault "suspend";
+      IdleActionSec = lib.mkDefault 600;
+      # Close lid action (hardware-specific settings will override)
+      HandleLidSwitch = lib.mkDefault "suspend";
+      HandleLidSwitchExternalPower = lib.mkDefault "suspend";
+      HandleLidSwitchDocked = lib.mkDefault "ignore";
+      # Power button action (hardware-specific settings will override)
+      HandlePowerKey = lib.mkDefault "poweroff";
+      HandlePowerKeyLongPress = lib.mkDefault "ignore";
       # Suspend on critical battery
-      HandleCriticalPower=PowerOff
-  '';
+      HandleCriticalPower = lib.mkDefault "PowerOff";
+    };
+  };
 
   # Automatic CPU frequency scaling
   services.cpupower-gui.enable = false; # We'll use power-profiles-daemon

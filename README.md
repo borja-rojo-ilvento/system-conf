@@ -1,5 +1,6 @@
 # NixOS System Configuration
 
+note
 Modular NixOS configuration using flakes with four-layer architecture for the ThinkPad P14s Gen2 "jaro" system.
 
 ## Quick Start

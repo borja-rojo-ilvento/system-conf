@@ -44,6 +44,11 @@
     };
   };
 
+  # NetworkManager WiFi profiles
+  networking.networkmanager.ensureProfiles.profiles = {
+    "jean.net" = import ../system/wifi-profiles/jean.net.nix;
+  };
+
   # Gaming configuration
   programs = {
     steam = {

@@ -1,0 +1,140 @@
+* {
+  bg0:    #282828;
+  bg1:    #3c3836;
+  bg2:    #504945;
+  fg0:    #ebdbb2;
+  fg1:    #d5c4a1;
+  red:    #cc241d;
+  green:  #98971a;
+  yellow: #d79921;
+  blue:   #458588;
+  purple: #b16286;
+  aqua:   #689d6a;
+  orange: #d65d0e;
+
+  background-color:  transparent;
+  border-color:      @blue;
+  separatorcolor:    @bg2;
+  scrollbar-handle:  @blue;
+  foreground:        @fg0;
+  text-color:        @fg0;
+}
+
+window {
+  background-color: @bg0;
+  border:           2px;
+  border-color:     @blue;
+  border-radius:    8px;
+  padding:          20px;
+  width:            50%;
+  anchor:           center;
+}
+
+prompt {
+  enabled:          true;
+  padding:          8px 12px;
+  background-color: @bg1;
+  border-radius:    4px;
+  text-color:       @blue;
+}
+
+entry {
+  background-color: @bg1;
+  text-color:       @fg0;
+  placeholder-color: @bg2;
+  padding:          8px 12px;
+  border-radius:    4px;
+  margin:           0px 0px 0px 8px;
+}
+
+inputbar {
+  children:         [ prompt, entry ];
+  spacing:          12px;
+  padding:          12px;
+  background-color: @bg1;
+  border-radius:    4px;
+  margin-bottom:    12px;
+}
+
+listview {
+  lines:            10;
+  columns:          1;
+  cycle:            true;
+  dynamic:          true;
+  scrollbar:        true;
+  spacing:          4px;
+  padding:          0px;
+  background-color: transparent;
+}
+
+scrollbar {
+  background-color: @bg1;
+  handle-color:     @blue;
+  handle-width:     8px;
+  border-radius:    4px;
+  margin:           0px 4px;
+}
+
+element {
+  padding:          8px 12px;
+  background-color: transparent;
+  text-color:       @fg0;
+  border-radius:    4px;
+  orientation:      horizontal;
+}
+
+element.normal {
+  background-color: transparent;
+  text-color:       @fg0;
+}
+
+element.selected {
+  background-color: @blue;
+  text-color:       @bg0;
+  border-radius:    4px;
+}
+
+element.active {
+  background-color: @green;
+  text-color:       @bg0;
+}
+
+element.urgent {
+  background-color: @red;
+  text-color:       @bg0;
+}
+
+element-icon {
+  background-color: transparent;
+  text-color:       inherit;
+  size:             32px;
+  border:           0px;
+  margin:           0px 8px 0px 0px;
+}
+
+element-text {
+  background-color: transparent;
+  text-color:       inherit;
+  highlight:        inherit;
+  vertical-align:   0.5;
+}
+
+message {
+  background-color: @bg1;
+  border:           2px 0px 0px 0px;
+  border-color:     @bg2;
+  padding:          8px;
+  spacing:          8px;
+}
+
+textbox {
+  text-color: @fg1;
+  background-color: transparent;
+}
+
+error-message {
+  padding:          8px;
+  border-radius:    4px;
+  background-color: @red;
+  text-color:       @bg0;
+}

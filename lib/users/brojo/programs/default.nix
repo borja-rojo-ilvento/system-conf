@@ -6,6 +6,7 @@
     ./neovim.nix
     ./discord.nix
     ./dunst.nix
+    ./rofi
     ./hyprland
   ];
 
@@ -37,7 +38,7 @@
             "direnv"
           ];
         };
-        initExtra = ''
+        initContent = ''
           fpath=(/home/brojo/.zsh/completions $fpath)
           autoload -Uz compinit && compinit
         '';

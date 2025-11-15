@@ -17,8 +17,6 @@
   wayland.windowManager.hyprland.settings = {
     "$mod" = "SUPER";
     input = {
-      kb_layout = "us";
-      kb_variant = "qwerty";
       kb_options = "caps:ctrl_modifier";
       repeat_rate = 50;
       repeat_delay = 200;
@@ -118,6 +116,7 @@
     bind = [
       "$mod, F, exec, firefox"
       "$mod, Return, exec, ghostty"
+      "$mod, space, exec, rofi -show drun"
       ", Print, exec, grimblast copy area"
 
       # Focus navigation in master layout (Vim-like)

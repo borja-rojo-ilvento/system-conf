@@ -26,6 +26,7 @@
 
         modules-right = [
           "network"
+          "bluetooth"
           "backlight"
           "wireplumber"
           "battery"
@@ -70,38 +71,42 @@
 
         network = {
           interval = 1;
-          format-wifi = "{essid}";
+          format-wifi = "󰤥 {essid}";
           format-ethernet = "󰈀 Ethernet";
-          tooltip-format-ethernet = "󰈀 {ipaddr}";
-          tooltip-format-wifi = "{essid} ({signalStrength}%)";
-          tooltip-format = "󰤯 {ifname} via {gwaddr}";
-          format-linked = "󰀦 {ifname} (No IP)";
-          format-disconnected = "󰀦 Disconnected";
+          format-linked = "󰀦 {ifname}";
+          format-disconnected = "󰌙 Offline";
+          tooltip-format-wifi = "󰤥 {essid}\n  Signal: {signalStrength}%\n  Frequency: {frequency} GHz";
+          tooltip-format-ethernet = "󰈀 {ifname}\n  IP: {ipaddr}";
+          tooltip-format-disconnected = "󰌙 No connection";
           format-alt = "{ifname}: {gwaddr}/{cidr}";
+        };
+
+        bluetooth = {
+          format = "󰂲 Off";
+          format-connected = "󰂯 {device_alias}";
+          format-connected-battery = "󰂯 {device_alias} {device_battery_percentage}%";
+          tooltip-format = "󰂲 Bluetooth Off";
+          tooltip-format-connected = "󰂯 Connected ({num_connections})\n{device_enumerate}";
+          tooltip-format-enumerate-connected = "  {device_alias}";
+          tooltip-format-enumerate-connected-battery = "  {device_alias} ({device_battery_percentage}%)";
         };
 
         backlight = {
           format = "{icon} {percent}%";
           format-icons = [
-            ""
-            ""
-            ""
-            ""
-            ""
-            ""
-            ""
-            ""
-            ""
+            "󰃞"
+            "󰃟"
+            "󰃠"
           ];
         };
 
         wireplumber = {
           format = "{icon} {volume}%";
-          format-muted = "󰖁 {volume}%";
+          format-muted = "󰖁 Muted";
           format-icons = [
-            ""
-            ""
-            ""
+            "󰕿"
+            "󰖀"
+            "󰕾"
           ];
           on-click = "pavucontrol";
         };
@@ -110,12 +115,21 @@
           format = "{icon} {capacity}%";
           format-alt = "{icon} {time}";
           format-icons = [
-            ""
-            ""
-            ""
-            ""
-            ""
+            "󰂎"
+            "󰁺"
+            "󰁻"
+            "󰁼"
+            "󰁽"
+            "󰁾"
+            "󰁿"
+            "󰂀"
+            "󰂁"
+            "󰂂"
           ];
+          states = {
+            warning = 20;
+            critical = 10;
+          };
           interval = 2;
         };
 
@@ -191,6 +205,7 @@
       #battery,
       #backlight,
       #network,
+      #bluetooth,
       #wireplumber {
         color: #282828;
         background-color: #282828;
@@ -202,6 +217,16 @@
 
       #network {
         background-color: #458588;
+        color: #ebdbb2;
+      }
+
+      #bluetooth {
+        background-color: #8ec07c;
+        color: #282828;
+      }
+
+      #bluetooth.disconnected {
+        background-color: #cc241d;
         color: #ebdbb2;
       }
 
@@ -240,6 +265,16 @@
       #battery.plugged {
         background-color: #b8bb26;
         color: #282828;
+      }
+
+      #battery.warning {
+        background-color: #d79921;
+        color: #282828;
+      }
+
+      #battery.critical {
+        background-color: #cc241d;
+        color: #ebdbb2;
       }
     '';
   };

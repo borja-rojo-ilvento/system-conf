@@ -141,6 +141,9 @@
       ", XF86AudioPlay, exec, playerctl play-pause"
       ", XF86AudioNext, exec, playerctl next"
       ", XF86AudioPrev, exec, playerctl previous"
+
+      # Do-not-disturb toggle for notifications (enable when ready)
+      # "$mod SHIFT, D, exec, dunstctl set-paused toggle"
     ]
     ++ (
       # workspaces

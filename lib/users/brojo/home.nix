@@ -65,6 +65,9 @@
     # Audio control
     wireplumber
     playerctl
+    # Terminal and fonts
+    wl-clipboard
+    nerd-fonts.jetbrains-mono
   ];
 
   home.stateVersion = "24.11";

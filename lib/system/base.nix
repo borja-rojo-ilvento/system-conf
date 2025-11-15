@@ -115,4 +115,7 @@
   # Polkit for privilege escalation
   security.polkit.enable = true;
 
+  # Battery monitoring and notifications
+  services.upower.enable = true;
+
 }

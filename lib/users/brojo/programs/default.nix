@@ -17,6 +17,8 @@
       lutris
       bottles
       heroic
+      nemo
+      gvfs
     ];
 
     programs = {

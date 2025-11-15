@@ -1,7 +1,4 @@
 { config, pkgs, ... }:
-let
-  theme = builtins.readFile ./theme.rasi;
-in
 {
   programs.rofi = {
     enable = true;
@@ -10,7 +7,7 @@ in
     terminal = "ghostty";
     location = "center";
     cycle = true;
-    theme = theme;
+    theme = ./theme.rasi;
     modes = [ "drun" "run" "window" ];
     extraConfig = {
       show-icons = true;
@@ -21,6 +18,8 @@ in
       display-ssh = "   ";
     };
   };
+
+  xdg.configFile."rofi/theme.rasi".source = ./theme.rasi;
 
   home.packages = with pkgs; [
     rofi

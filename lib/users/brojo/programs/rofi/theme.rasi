@@ -12,12 +12,8 @@
   aqua:   #689d6a;
   orange: #d65d0e;
 
-  background-color:  transparent;
-  border-color:      @blue;
-  separatorcolor:    @bg2;
-  scrollbar-handle:  @blue;
-  foreground:        @fg0;
-  text-color:        @fg0;
+  background-color: transparent;
+  text-color: #ebdbb2;
 }
 
 window {
@@ -26,7 +22,7 @@ window {
   border-color:     @blue;
   border-radius:    8px;
   padding:          20px;
-  width:            50%;
+  width:            40%;
   anchor:           center;
 }
 
@@ -57,7 +53,7 @@ inputbar {
 }
 
 listview {
-  lines:            10;
+  lines:            4;
   columns:          1;
   cycle:            true;
   dynamic:          true;

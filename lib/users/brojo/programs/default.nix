@@ -8,6 +8,8 @@
     ./dunst.nix
     ./rofi
     ./hyprland
+    ./theming.nix
+    ./power-management.nix
   ];
 
   config = {

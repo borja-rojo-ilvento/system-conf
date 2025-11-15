@@ -113,6 +113,70 @@
       # Master always centered (regardless of slave count)
       slave_count_for_center_master = 0;
     };
+
+    # Workspace groups by use case
+    workspace = [
+      # Primary workspaces (0-indexed)
+      "1, monitor:eDP-1, default:true"
+      "2, monitor:eDP-1"
+      "3, monitor:eDP-1"
+      "4, monitor:eDP-1"
+      "5, monitor:eDP-1"
+      "6, monitor:eDP-1"
+      "7, monitor:eDP-1"
+      "8, monitor:eDP-1"
+      "9, monitor:eDP-1"
+    ];
+    windowrulev2 = [
+      # Workspace assignments by use case
+      "workspace 1, class:^(firefox)$"
+      "workspace 2, class:^(ghostty|foot|kitty)$"
+      "workspace 3, class:^(discord)$"
+      "workspace 4, class:^(steam)$"
+      "workspace 5, class:^(obs)$"
+
+      # Floating windows for dialogs and tools
+      "float, class:^(rofi)$"
+      "float, class:^(pavucontrol)$"
+      "float, class:^(thunar)$"
+      "float, class:^(xfce4-appfinder)$"
+
+      # Firefox rules - tiling, slightly transparent
+      "opacity 0.95 0.95, class:^(firefox)$"
+      "tile, class:^(firefox)$"
+
+      # Terminal rules - keep tiling
+      "tile, class:^(ghostty|foot|kitty)$"
+
+      # Discord rules - workspace 3, floating or tiling
+      "tile, class:^(discord)$"
+
+      # Steam rules - workspace 4, allow fullscreen
+      "tile, class:^(steam)$"
+
+      # OBS rules - workspace 5
+      "tile, class:^(obs)$"
+
+      # File manager rules - floating
+      "float, class:^(thunar)$"
+      "size 60% 60%, class:^(thunar)$"
+      "center, class:^(thunar)$"
+
+      # Settings/preferences windows - floating, centered
+      "float, class:^([Ss]ystem.*[Ss]etting)"
+      "center, class:^([Ss]ystem.*[Ss]etting)"
+
+      # Sticky windows (always visible)
+      "sticky, title:^(Picture-in-Picture)"
+
+      # Opacity for inactive windows
+      "opacity 0.85 0.90, activewindow:0"
+    ];
+
+    windowrule = [
+      # Legacy rules if needed for compatibility
+    ];
+
     bind = [
       "$mod, F, exec, firefox"
       "$mod, Return, exec, ghostty"

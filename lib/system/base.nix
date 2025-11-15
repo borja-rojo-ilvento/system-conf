@@ -9,6 +9,7 @@
   imports = [
     ./hyprpolkitagent.nix
     ./hyprland
+    ./power-management.nix
   ];
 
   # Nix configuration

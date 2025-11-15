@@ -1,7 +1,7 @@
 ---
 id: task-017
 title: Research terminal-based alternatives to desktop applications
-status: In Progress
+status: To Do
 assignee: []
 created_date: '2025-11-15 04:39'
 updated_date: '2025-11-15 04:40'

@@ -11,6 +11,7 @@
     ./theming.nix
     ./power-management.nix
     ./development.nix
+    ./input-method.nix
   ];
 
   config = {

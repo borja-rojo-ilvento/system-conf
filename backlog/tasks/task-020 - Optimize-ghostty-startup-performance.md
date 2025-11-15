@@ -1,9 +1,10 @@
 ---
 id: task-020
 title: Optimize ghostty startup performance
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2025-11-15 22:32'
+updated_date: '2025-11-15 22:32'
 labels:
   - ghostty
   - performance

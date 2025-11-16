@@ -44,10 +44,10 @@
             "direnv"
           ];
         };
-        initContent = ''
-          fpath=(/home/brojo/.zsh/completions $fpath)
-          autoload -Uz compinit && compinit
-        '';
+        # initContent = ''
+        #   fpath=(/home/brojo/.zsh/completions $fpath)
+        #   autoload -Uz compinit && compinit
+        # '';
       };
 
       direnv = {

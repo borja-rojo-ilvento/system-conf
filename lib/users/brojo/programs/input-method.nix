@@ -6,8 +6,8 @@
   i18n.inputMethod = {
     enabled = "fcitx5";
     fcitx5.addons = with pkgs; [
-      fcitx5-chinese-addons  # Chinese input support (Pinyin)
-      fcitx5-mozc            # Japanese input support (Google's Mozc)
+      qt6Packages.fcitx5-chinese-addons # Chinese input support (Pinyin)
+      fcitx5-mozc # Japanese input support (Google's Mozc)
     ];
   };
 

@@ -180,7 +180,7 @@ in
 
     bind = [
       "$mod, F, exec, firefox"
-      "$mod, Return, exec, ghostty"
+      "$mod, Return, exec, ghostty +new-window"
       "$mod, space, exec, rofi -show drun"
       ", Print, exec, grimblast copy area"
 

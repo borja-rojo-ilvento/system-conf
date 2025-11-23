@@ -9,7 +9,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     backlog-md = {
-      url = "github:MrLesk/Backlog.md/595a6dc6e16b722a680c7d5632173ce939f5b942";
+      url = "github:MrLesk/Backlog.md";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

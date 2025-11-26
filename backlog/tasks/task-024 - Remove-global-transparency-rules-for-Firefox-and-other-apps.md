@@ -1,9 +1,10 @@
 ---
 id: task-024
 title: Remove global transparency rules for Firefox and other apps
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2025-11-26 20:29'
+updated_date: '2025-11-26 22:51'
 labels: []
 dependencies: []
 priority: medium

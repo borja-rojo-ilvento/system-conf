@@ -1,7 +1,7 @@
 ---
 id: task-021
 title: Research tiling window manager best practices for handling minimized windows
-status: In Progress
+status: Done
 assignee: []
 created_date: '2025-11-26 20:29'
 updated_date: '2025-11-26 21:18'

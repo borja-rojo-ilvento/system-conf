@@ -3,7 +3,7 @@ id: task-023
 title: >-
   Remove workspace-specific window rules - windows should open in current
   workspace
-status: In Progress
+status: Done
 assignee: []
 created_date: '2025-11-26 20:29'
 updated_date: '2025-11-26 22:45'

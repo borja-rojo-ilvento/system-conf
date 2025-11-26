@@ -4,7 +4,7 @@ title: Research tiling window manager best practices for handling minimized wind
 status: Done
 assignee: []
 created_date: '2025-11-26 20:29'
-updated_date: '2025-11-26 21:18'
+updated_date: '2025-11-26 21:27'
 labels: []
 dependencies: []
 priority: medium
@@ -80,4 +80,84 @@ bind = ALT, X, togglespecialworkspace
 - No explicit show/hide (only toggle)
 - Hidden special workspace windows can be focused inadvertently
 - Special workspaces may conflict with fullscreen windows
+
+## Zoom-Specific Window Management Solutions
+
+### The Zoom Problem in Tiling WMs
+
+Zoom creates multiple windows that are invasive for tiling window managers:
+1. **Main app window**: Navigation menus and agenda information
+2. **Meeting window**: Separate popup for actual meetings
+3. **Notification popups**: "Informative" popups that steal focus
+4. **Menu/toolbar windows**: Various UI elements as separate windows
+
+### Community Solutions
+
+#### Basic Approach: Float All Zoom Windows
+```
+windowrulev2 = float,class:(^zoom$)
+windowrulev2 = center,class:(^zoom$)
+```
+
+#### Advanced: Target Specific Zoom Windows
+
+Zoom windows identified via `hyprctl clients`:
+- **class**: `zoom` (lowercase)
+- **Common titles**: 
+  - `menu window` - popup menus
+  - `confirm window` - confirmation dialogs
+  - `Zoom Meeting` - meeting windows
+  - Various notification windows
+
+**Selective Rules Example**:
+```
+# Float meeting windows
+windowrulev2 = float,class:(^zoom$),title:(Zoom Meeting)
+
+# Float and don't focus notification popups
+windowrulev2 = float,class:(^zoom$),title:(^zoom\s?$)
+windowrulev2 = nofocus,class:(^zoom$),title:(^zoom\s?$)
+```
+
+#### Solutions from i3/Sway Users
+
+From i3 config (similar principles apply to Hyprland):
+```
+# Set Zoom notification window to floating with no focus
+for_window [title="^zoom\\s?$"] floating enable
+no_focus [title="^zoom\\s?$"]
+```
+
+Some users implement scripts to **instantly kill** notification popups so they never disturb workflow.
+
+### Investigation Steps for This System
+
+1. **Run Zoom and inspect windows**:
+   ```bash
+   hyprctl clients
+   ```
+   Document all class/title combinations
+
+2. **Identify which windows need floating**:
+   - Main app window: Possibly tile or float?
+   - Meeting window: Likely float + center
+   - Notification popups: Float + nofocus or kill
+
+3. **Configure window rules** based on findings
+
+4. **Test workflow** and refine rules
+
+### Additional Considerations
+
+- **XWayland**: Zoom runs via XWayland (xwayland: 1)
+- **Screen sharing**: Requires additional Hyprland configuration (xdg-desktop-portal-hyprland)
+- **Workspace behavior**: Zoom doesn't work well with virtual workspaces - windows may disappear when switching
+- **Static vs dynamic rules**: Use `initialClass` and `initialTitle` for static rules that apply at window creation
+
+### Recommended Next Steps
+
+1. Install/configure Zoom if not already done
+2. Run Zoom and capture window properties with `hyprctl clients`
+3. Create targeted window rules for each Zoom window type
+4. Consider creating a separate task for implementing the Zoom window rules
 <!-- SECTION:NOTES:END -->

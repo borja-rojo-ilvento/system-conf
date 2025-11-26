@@ -1,10 +1,10 @@
 ---
 id: task-019
 title: Enable automatic WiFi connection with saved passwords on login and wake
-status: In Progress
+status: Done
 assignee: []
 created_date: '2025-11-15 17:31'
-updated_date: '2025-11-15 17:58'
+updated_date: '2025-11-26 21:09'
 labels: []
 dependencies: []
 priority: medium

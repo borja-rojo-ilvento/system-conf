@@ -105,7 +105,7 @@
 
   # Git configuration is in programs/default.nix
   # Enhanced here with signing and credential helpers
-  programs.git.extraConfig = {
+  programs.git.settings = {
     # Improved diff and merge behavior
     diff.algorithm = "histogram";
     merge.conflictStyle = "zdiff3";

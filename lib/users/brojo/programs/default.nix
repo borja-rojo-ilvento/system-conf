@@ -28,8 +28,12 @@
     programs = {
       git = {
         enable = true;
-        userName = "Borja Rojo Ilvento";
-        userEmail = "borja.rojo@gmail.com";
+        settings = {
+          user = {
+            name = "Borja Rojo Ilvento";
+            email = "borja.rojo@gmail.com";
+          };
+        };
       };
 
       zsh = {

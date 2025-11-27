@@ -2,6 +2,10 @@
 let
   firefox-client-class = "firefox";
   ghostty-client-class = "com.mitchellh.ghostty";
+  wallpaper = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/AngelJumbo/gruvbox-wallpapers/main/wallpapers/minimalistic/atoms.png";
+    sha256 = "0bb0kks8kraqh78ajxh0cvjcnw45cwbswm6mvkyfdk9nvxx581ba";
+  };
 in
 {
   imports = [
@@ -11,6 +15,16 @@ in
   home.packages = with pkgs; [
     ghostty
   ];
+
+  services.hyprpaper = {
+    enable = true;
+    settings = {
+      ipc = "on";
+      splash = false;
+      preload = [ "${wallpaper}" ];
+      wallpaper = [ ",${wallpaper}" ]; # Empty monitor name = all monitors
+    };
+  };
 
   wayland.windowManager.hyprland = {
     enable = true;
@@ -132,21 +146,16 @@ in
       "9, monitor:eDP-1"
     ];
     windowrulev2 = [
-      # Workspace assignments by use case
-      "workspace 1, class:^(${firefox-client-class})$"
-      "workspace 2, class:^(${ghostty-client-class})$"
-      "workspace 3, class:^(discord)$"
-      "workspace 4, class:^(steam)$"
-      "workspace 5, class:^(obs)$"
-
       # Floating windows for dialogs and tools
       "float, class:^(rofi)$"
       "float, class:^(pavucontrol)$"
       "float, class:^(thunar)$"
       "float, class:^(xfce4-appfinder)$"
 
-      # Firefox rules - tiling, slightly transparent
-      "opacity 0.95 0.95, class:^(firefox)$"
+      # Firefox pop-up windows - browser extension dialogs
+      "float, class:^(firefox)$, title:^(Extension:.*)"
+
+      # Firefox rules - tiling (for main browser windows)
       "tile, class:^(firefox)$"
 
       # Terminal rules - keep tiling
@@ -172,6 +181,9 @@ in
 
       # Picture-in-Picture windows - floating
       "float, title:^(Picture-in-Picture)"
+
+      # Zoom windows - all float for better UX in tiling WM
+      "float, class:^(zoom)$"
     ];
 
     windowrule = [

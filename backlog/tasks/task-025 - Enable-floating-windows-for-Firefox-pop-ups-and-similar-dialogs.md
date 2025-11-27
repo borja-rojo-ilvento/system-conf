@@ -1,10 +1,10 @@
 ---
 id: task-025
 title: Enable floating windows for Firefox pop-ups and similar dialogs
-status: In Progress
+status: Done
 assignee: []
 created_date: '2025-11-26 21:05'
-updated_date: '2025-11-26 23:01'
+updated_date: '2025-11-27 02:14'
 labels: []
 dependencies: []
 priority: medium

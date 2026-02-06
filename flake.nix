@@ -45,6 +45,27 @@
             }
           ];
         };
+        everest = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            inherit (inputs) nixos-hardware home-manager;
+          };
+          modules = [
+            # Hardware configuration
+            ./lib/hardware/machines/bung-box
+
+            # Host type configuration
+            (import ./lib/hosts { hostname = "everest"; })
+
+            # Home manager
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.brojo = import ./lib/users/brojo/home.nix;
+            }
+          ];
+        };
       };
 
       devShells = {

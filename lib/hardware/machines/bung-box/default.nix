@@ -9,9 +9,18 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
+  boot.blacklistedKernelModules = [ "nouveau" ];
+
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware = {
     enableAllFirmware = true;
+    nvidia = {
+      modesetting.enable = true;
+      open = true;
+      nvidiaSettings = true;
+    };
+    
     graphics = { enable = true; enable32Bit = true; };
     bluetooth = { enable = true; powerOnBoot = true; };
   };

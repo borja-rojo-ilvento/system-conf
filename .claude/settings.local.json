@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": [
+    "backlog"
+  ],
+  "enableAllProjectMcpServers": true
+}

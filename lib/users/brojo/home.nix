@@ -68,7 +68,6 @@
     # Terminal and fonts
     wl-clipboard
     nerd-fonts.jetbrains-mono
-    zed-editor
   ];
 
   home.stateVersion = "24.11";

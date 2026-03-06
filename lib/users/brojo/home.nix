@@ -68,6 +68,8 @@
     # Terminal and fonts
     wl-clipboard
     nerd-fonts.jetbrains-mono
+    openssl
+    opencode
   ];
 
   home.stateVersion = "24.11";

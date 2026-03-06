@@ -2,7 +2,6 @@
 {
   imports = [
     ./obs.nix
-    ./steam.nix
     ./neovim.nix
     ./discord.nix
     ./dunst.nix

@@ -65,8 +65,22 @@
         proton-ge-bin
       ];
       gamescopeSession.enable = true;
+
+      # Add NVIDIA libraries to Steam FHS environment
+      extraPackages = with pkgs; [
+        libva
+        intel-media-driver  # Intel video acceleration
+      ];
     };
     gamemode.enable = true;
+  };
+
+  # Make Steam automatically use NVIDIA GPU in offload mode
+  environment.sessionVariables = {
+    # Force Steam and games to use NVIDIA GPU
+    __NV_PRIME_RENDER_OFFLOAD = "1";
+    __VK_LAYER_NV_optimus = "NVIDIA_only";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
   };
 
   # Performance optimization for OBS

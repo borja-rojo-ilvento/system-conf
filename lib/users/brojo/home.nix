@@ -70,6 +70,9 @@
     nerd-fonts.jetbrains-mono
     openssl
     opencode
+    # Controller testing tools
+    linuxConsoleTools  # Provides jstest for testing joystick input
+    jstest-gtk         # GUI tool for testing game controllers
   ];
 
   home.stateVersion = "24.11";

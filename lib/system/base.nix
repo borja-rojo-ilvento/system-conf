@@ -10,6 +10,7 @@
     ./hyprpolkitagent.nix
     ./hyprland
     ./power-management.nix
+    ./xbox-controller.nix
   ];
 
   # Nix configuration
@@ -31,6 +32,15 @@
       dates = "weekly";
       options = "--delete-older-than 7d";
     };
+  };
+
+  hardware = {
+    bluetooth = {
+      enable = true;
+      powerOnBoot = true;
+    };
+
+    steam-hardware.enable = true;
   };
 
   # Boot configuration

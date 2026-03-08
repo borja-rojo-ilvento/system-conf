@@ -75,6 +75,10 @@
       ];
     };
     gamemode.enable = true;
+    gamescope = {
+      enable = true;
+      capSysNice = true;
+    };
   };
 
   # Performance optimization for OBS

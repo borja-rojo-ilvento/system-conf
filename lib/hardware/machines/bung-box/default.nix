@@ -19,6 +19,7 @@
       modesetting.enable = true;
       open = true;
       nvidiaSettings = true;
+      package = config.boot.kernelPackages.nvidiaPackages.latest;
     };
     
     graphics = { enable = true; enable32Bit = true; };
@@ -27,6 +28,16 @@
 
   programs.steam.extraPackages = with pkgs; [
     nvidia-vaapi-driver
+    libxcursor
+    libxi
+    libxinerama
+    libxscrnsaver
+    libpng
+    libpulseaudio
+    libvorbis
+    stdenv.cc.cc.lib
+    libkrb5
+    keyutils
   ];
 
   environment.sessionVariables = {
@@ -34,6 +45,7 @@
     NVD_BACKEND = "direct";
     __GL_GSYNC_ALLOWED = "0";
     __GL_VRR_ALLOWED = "0";
+    NIXOS_OZONE_WL = "1";
   };
 }
 

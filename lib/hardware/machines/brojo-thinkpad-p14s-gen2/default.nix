@@ -47,6 +47,18 @@
 
   };
 
+  # PRIME offload env vars — force apps to use NVIDIA GPU
+  environment.sessionVariables = {
+    __NV_PRIME_RENDER_OFFLOAD = "1";
+    __VK_LAYER_NV_optimus = "NVIDIA_only";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+  };
+
+  # Intel video acceleration for Steam
+  programs.steam.extraPackages = with pkgs; [
+    intel-media-driver
+  ];
+
   services.logind.settings.Login = {
     HandleLidSwtich = "suspend-then-hibernate";
     HandleLidSwitchExternalPower = "lock";

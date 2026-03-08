@@ -1,11 +1,12 @@
 {
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(find:*)"
+    ]
+  },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "backlog"
-  ],
-  "permissions": {
-    "allow": [
-      "WebSearch"
-    ]
-  }
+  ]
 }

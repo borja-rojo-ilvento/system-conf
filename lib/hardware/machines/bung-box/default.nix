@@ -24,5 +24,16 @@
     graphics = { enable = true; enable32Bit = true; };
     bluetooth = { enable = true; powerOnBoot = true; };
   };
+
+  programs.steam.extraPackages = with pkgs; [
+    nvidia-vaapi-driver
+  ];
+
+  environment.sessionVariables = {
+    LIBVA_DRIVER_NAME = "nvidia";
+    NVD_BACKEND = "direct";
+    __GL_GSYNC_ALLOWED = "0";
+    __GL_VRR_ALLOWED = "0";
+  };
 }
 

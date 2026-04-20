@@ -23,6 +23,7 @@
       nil
       fzf
       claude-code
+      vale
     ];
     # plugins = with pkgs.vimPlugins; [
     #   lazy-nvim

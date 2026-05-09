@@ -83,7 +83,7 @@
     lm_sensors
 
     # System information
-    neofetch
+    fastfetch
     lsof
 
     # Systemd tools

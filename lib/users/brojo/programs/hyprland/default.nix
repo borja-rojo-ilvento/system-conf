@@ -1,4 +1,12 @@
 { config, pkgs, ... }:
+# ─────────────────────────────────────────────────────────────────────────────
+# Sequestered Hyprland user (home-manager) module.
+#
+# Intentionally NOT imported from lib/users/brojo/programs/default.nix. The
+# active session is Plasma 6 / Wayland on every host. Source preserved so the
+# config can be revived later — see lib/system/hyprland/default.nix for the
+# system-side counterpart and revival steps.
+# ─────────────────────────────────────────────────────────────────────────────
 let
   firefox-client-class = "firefox";
   ghostty-client-class = "com.mitchellh.ghostty";
@@ -10,6 +18,7 @@ in
 {
   imports = [
     ./waybar.nix
+    ./idle-lock.nix # swaylock + hypridle + Hyprland power-keybinds fragment.
   ];
 
   home.packages = with pkgs; [

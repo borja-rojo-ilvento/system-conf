@@ -20,7 +20,6 @@
   # Productivity host services
   services.udev.packages = [ pkgs.ledger-udev-rules ];
 
-  xdg.portal.enable = true;
   services.flatpak.enable = true;
 
   systemd.services.flatpak-repo = {
@@ -29,12 +28,6 @@
     script = ''
       flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     '';
-  };
-
-  # Hyprland window manager
-  programs.hyprland = {
-    enable = true;
-    withUWSM = true;
   };
 
   # NetworkManager credential storage
@@ -103,4 +96,15 @@
       kdePackages.kate
     ];
   };
+
+  # ── Anex: prior approaches and why they were dropped ────────────────────────
+  #
+  # Tried: programs.hyprland.enable + withUWSM here, plus xdg.portal.enable
+  # toggled from this layer.
+  # Both moved out: hyprland enablement now lives entirely inside
+  # lib/system/hyprland/default.nix (which is intentionally not imported — see
+  # that file), and xdg.portal lives in lib/system/base.nix as part of the
+  # systems-layer OS shape. The hosts layer is intended to wire composition
+  # rather than introduce compositor-specific knobs.
 }
+

@@ -8,10 +8,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    backlog-md = {
-      url = "github:MrLesk/Backlog.md";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -19,7 +15,6 @@
       self,
       nixpkgs,
       home-manager,
-      backlog-md,
       ...
     }@inputs:
     {
@@ -85,12 +80,11 @@
                 nix
                 nixos-rebuild
                 claude-code
-                backlog-md.packages.x86_64-linux.default
               ];
 
               shellHook = ''
                 echo "Entering NixOS configuration development environment"
-                echo "Available tools: git, nix, nixos-rebuild, backlog-md"
+                echo "Available tools: git, nix, nixos-rebuild"
               '';
             };
           };

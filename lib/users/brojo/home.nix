@@ -56,7 +56,6 @@
     gemini-cli
     eza
     audacity
-    claude-code
     freerdp
     remmina
     mesa-demos
@@ -68,13 +67,12 @@
     # Terminal and fonts
     wl-clipboard
     nerd-fonts.jetbrains-mono
-    openssl
     opencode
     # Controller testing tools
     linuxConsoleTools  # Provides jstest for testing joystick input
     jstest-gtk         # GUI tool for testing game controllers
   ];
 
-  home.stateVersion = "24.11";
+  home.stateVersion = "26.05";
 
 }

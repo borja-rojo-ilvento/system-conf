@@ -1,65 +1,44 @@
 { config, lib, pkgs, ... }:
 {
-  # Power management configuration
-  powerManagement = {
-    enable = true;
-    # Systemd will handle power management
-    cpuFreqGovernor = "schedutil";
-  };
+  # Systemd-level power management (suspend/resume hooks, runtime PM frame).
+  powerManagement.enable = true;
 
-  # Power profiles daemon for switching between performance/balanced/power-saver
+  # Power profiles daemon for switching between performance/balanced/power-saver.
   services.power-profiles-daemon.enable = true;
 
-  # TLP for advanced battery management (alternative to power-profiles-daemon)
-  # services.tlp.enable = true;
-
-  # Sleep and suspend behavior (with defaults that can be overridden by hardware)
+  # Sleep and suspend behavior. Hardware/host modules may override per-machine.
   services.logind.settings = {
     Login = {
-      # Screen blanking timeout (in seconds) - 10 minutes
       IdleAction = lib.mkDefault "suspend";
       IdleActionSec = lib.mkDefault 600;
-      # Close lid action (hardware-specific settings will override)
       HandleLidSwitch = lib.mkDefault "suspend";
       HandleLidSwitchExternalPower = lib.mkDefault "suspend";
       HandleLidSwitchDocked = lib.mkDefault "ignore";
-      # Power button action (hardware-specific settings will override)
       HandlePowerKey = lib.mkDefault "poweroff";
       HandlePowerKeyLongPress = lib.mkDefault "ignore";
-      # Suspend on critical battery
       HandleCriticalPower = lib.mkDefault "PowerOff";
     };
   };
 
-  # Automatic CPU frequency scaling
-  services.cpupower-gui.enable = false; # We'll use power-profiles-daemon
-
-  # ACPI event handling
-  services.acpid.enable = true;
-
-  # Thermald for thermal management (Intel processors)
+  # Thermald for thermal management (Intel processors).
   services.thermald.enable = true;
 
-  # Screen blanking and DPMS
+  # Display-manager log capture (useful when debugging suspend → DM crashes).
   services.displayManager.logToFile = true;
 
-  # X Server DPMS configuration (if X is used)
-  services.xserver = {
-    # DPMS (Display Power Management Signaling)
-    serverFlagsSection = ''
-      Option "BlankTime" "0"
-      Option "StandbyTime" "0"
-      Option "SuspendTime" "0"
-      Option "OffTime" "0"
-    '';
-  };
+  # X server DPMS (only consulted when an X session is in play).
+  services.xserver.serverFlagsSection = ''
+    Option "BlankTime" "0"
+    Option "StandbyTime" "0"
+    Option "SuspendTime" "0"
+    Option "OffTime" "0"
+  '';
 
   # System packages for power management
   environment.systemPackages = with pkgs; [
     power-profiles-daemon
     upower
     acpi
-    acpid
     brightnessctl
     playerctl
   ];
@@ -82,4 +61,21 @@
       }
     });
   '';
+
+  # ── Anex: prior approaches and why they were dropped ────────────────────────
+  #
+  # Tried: powerManagement.cpuFreqGovernor = "schedutil".
+  # Removed because power-profiles-daemon (enabled above) takes ownership of the
+  # CPU governor at runtime based on the active profile, so this setting was
+  # only honored briefly at boot before being overridden. Misleading rather than
+  # harmful.
+  #
+  # Tried: services.acpid.enable = true.
+  # Removed because systemd-logind handles lid/power/sleep button events
+  # directly via /dev/input → uinput; acpid is a legacy daemon for systems
+  # without logind and only created an extra subscriber to the same events.
+  #
+  # Tried: services.cpupower-gui.enable = false (a pseudo-toggle).
+  # Removed because Nix already defaults disabled options to off; explicit
+  # `= false` was just noise.
 }

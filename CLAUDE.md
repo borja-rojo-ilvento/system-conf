@@ -1,95 +1,87 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code working on this repo.
 
-## Project Overview
+## Project overview
 
-This is a modular NixOS system configuration repository using flakes. The architecture separates concerns across four layers: hardware, host types, users, and concrete systems. The current setup manages a ThinkPad P14s Gen2 laptop named "jaro" with KDE Plasma 6.
+Personal flake-based NixOS configuration. Two machines today: `jaro` (Lenovo
+ThinkPad P14s Gen 2, hybrid Intel + NVIDIA T500) and `everest` (custom desktop
+build, hardware dir `bung-box`). Active session on every host is Plasma 6 /
+Wayland.
 
-## Common Commands
+## Common commands
 
 ```bash
-# Build and switch to the configuration
+# Build and switch on this host
 sudo nixos-rebuild switch --flake .#jaro
+sudo nixos-rebuild switch --flake .#everest
 
-# Test the configuration without switching
+# Test without switching
 nixos-rebuild build --flake .#jaro
 
-# Update flake inputs
-nix flake update
+# Eval-only check
+nix flake check --no-build
 
-# Check flake evaluation
-nix flake check
+# Update inputs
+nix flake update
 ```
 
-## Architecture
+## Layout
 
-### Layer Structure
-- **`lib/hardware/`**: Pure hardware configurations, uses nixos-hardware flake
-- **`lib/hosts/`**: Host type definitions (system roles like productivity, server)
-- **`lib/users/`**: User configurations via Home Manager
-- **`lib/system/`**: Shared system-level base configurations
-- **`systems/`**: Concrete deployments combining the above layers
+Four layers under `lib/`. Each layer has a `README.md` describing its role and
+conventions; read those before making structural changes.
 
-### Key Patterns
-- Each concrete system (like `systems/jaro/`) combines exactly one hardware config, one host type, and one or more users
-- Hardware configs contain only hardware-specific settings (no users, hostnames, or application services)
-- Host types define system role and services, reusable across hardware
-- User configs are portable across systems
+- `lib/hardware/` — per-machine hardware specs.
+- `lib/system/`   — cross-cutting OS shape (audio, locale, DM, power, portals).
+- `lib/users/`    — Home Manager user envs, portable across machines.
+- `lib/hosts/`    — composition layer wiring hardware + system + users.
 
-### Parameter Passing
-The system uses `specialArgs` to pass custom parameters like hostname to modules. When using `specialArgs`, all flake inputs used by modules must be explicitly inherited:
+There is no top-level `systems/` directory. The flake assembles a configuration
+directly from one hardware module + the hosts function + the user modules. The
+system name (used by `--flake .#<name>`) and the hardware directory name are
+independent — the same hardware can host different system compositions over
+time (e.g. a future server build reusing `bung-box` hardware).
+
+## Sequestered modules
+
+`lib/system/hyprland/` and `lib/users/brojo/programs/hyprland/` are intact on
+disk but **not** on the active import path. Re-activation steps live in each
+sequestered `default.nix`.
+
+When in doubt: check whether a file is imported by walking from `flake.nix`
+through `lib/hosts/` and `lib/users/brojo/home.nix`. Dead modules are kept for
+reference, not for behavior.
+
+## Conventions
+
+- Hardware-specific knobs (e.g. `hardware.bluetooth`, GPU PRIME setup) belong
+  in the corresponding `lib/hardware/machines/<machine>/default.nix`, not in
+  `lib/system/base.nix`.
+- The hosts layer should not introduce compositor-specific or session-specific
+  config; it composes.
+- When dropping or replacing a configuration approach, leave a short
+  `── Anex: prior approaches ──` block at the bottom of the affected file
+  documenting what was tried and why it was dropped. This is the project's way
+  of preserving institutional memory without comment-bloating live code.
+
+## Parameter passing
+
+The hosts layer takes `hostname` as a function argument:
 
 ```nix
-specialArgs = {
-  inherit nixos-hardware home-manager;
-  hostname = "jaro";
-};
+(import ./lib/hosts { hostname = "jaro"; })
 ```
 
-## Development Notes
+Flake inputs that hardware modules need (currently `nixos-hardware`,
+`home-manager`) are passed via `specialArgs` from `flake.nix`.
 
-### Adding New Systems
-1. Create hardware config in `lib/hardware/machines/` (if new hardware)
-2. Create or reuse host type in `lib/hosts/`
-3. Create system config in `systems/new-hostname/`
-4. Add to `flake.nix` nixosConfigurations
+## Verifying suspend/resume on jaro
 
-### Current Known Issues
-- `specialArgs` requires explicit flake input inheritance (see TODO.md for alternative approaches being considered)
-- Hardware profiles in `lib/hardware/profiles/` are currently unused but planned for reusable hardware patterns
+After any NVIDIA-touching change:
 
-### Testing Changes
-Always test configuration builds before switching:
-- Use `nixos-rebuild build --flake .#jaro` to verify configuration builds
-- Hardware changes require careful testing due to potential boot/graphics issues
-- User configuration changes can be tested independently via Home Manager
-
-<!-- BACKLOG.MD MCP GUIDELINES START -->
-
-<CRITICAL_INSTRUCTION>
-
-## BACKLOG WORKFLOW INSTRUCTIONS
-
-This project uses Backlog.md MCP for all task and project management activities.
-
-**CRITICAL GUIDANCE**
-
-- If your client supports MCP resources, read `backlog://workflow/overview` to understand when and how to use Backlog for this project.
-- If your client only supports tools or the above request fails, call `backlog.get_workflow_overview()` tool to load the tool-oriented overview (it lists the matching guide tools).
-
-- **First time working here?** Read the overview resource IMMEDIATELY to learn the workflow
-- **Already familiar?** You should have the overview cached ("## Backlog.md Overview (MCP)")
-- **When to read it**: BEFORE creating tasks, or when you're unsure whether to track work
-
-These guides cover:
-- Decision framework for when to create tasks
-- Search-first workflow to avoid duplicates
-- Links to detailed guides for task creation, execution, and completion
-- MCP tools reference
-
-You MUST read the overview resource to understand the complete workflow. The information is NOT summarized here.
-
-</CRITICAL_INSTRUCTION>
-
-<!-- BACKLOG.MD MCP GUIDELINES END -->
+1. `cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status` should read
+   `suspended` at idle (no offloaded client running).
+2. `nvidia-smi` should report no graphics processes attached at idle.
+3. `cat /sys/power/mem_sleep` should show `s2idle [deep]` (BIOS Sleep State =
+   "Linux S3").
+4. Use the dGPU explicitly with `nvidia-offload <command>`.

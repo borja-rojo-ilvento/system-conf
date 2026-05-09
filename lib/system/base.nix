@@ -8,9 +8,10 @@
 {
   imports = [
     ./hyprpolkitagent.nix
-    ./hyprland
     ./power-management.nix
     ./xbox-controller.nix
+    # ./hyprland is intentionally not imported — see lib/system/hyprland/default.nix
+    # for the sequestered-but-preserved Hyprland system module.
   ];
 
   # Nix configuration
@@ -20,7 +21,6 @@
         "nix-command"
         "flakes"
       ];
-      auto-optimise-store = true;
       max-jobs = "auto";
       cores = 0;
       substituters = [ "https://hyprland.cachix.org" ];
@@ -32,14 +32,13 @@
       dates = "weekly";
       options = "--delete-older-than 7d";
     };
+    optimise = {
+      automatic = true;
+      dates = [ "weekly" ];
+    };
   };
 
   hardware = {
-    bluetooth = {
-      enable = true;
-      powerOnBoot = true;
-    };
-
     steam-hardware.enable = true;
   };
 
@@ -85,14 +84,13 @@
   # Nixpkgs configuration
   nixpkgs.config = {
     allowUnfree = true;
-    allowBroken = true;
   };
 
   # System version
   system.stateVersion = "24.05";
 
   services = {
-    xserver.enable = true; # Turn on the GUI (not X11 itself)
+    xserver.enable = true; # Required by SDDM even with Wayland session.
     displayManager = {
       sddm = {
         enable = true;
@@ -110,7 +108,8 @@
     passwd.enableKwallet = true;
   };
 
-  # XDG portal configuration for desktop integration
+  # XDG portal — OS-level desktop integration; lives in the systems layer because
+  # it is wanted on every host regardless of which compositor a host composes in.
   xdg.portal = {
     enable = true;
     extraPortals = [
@@ -129,4 +128,26 @@
   # Battery monitoring and notifications
   services.upower.enable = true;
 
+  # ── Anex: prior approaches and why they were dropped ────────────────────────
+  #
+  # Tried: nix.settings.auto-optimise-store = true.
+  # Removed because it hashes every newly-added store path during the rebuild,
+  # noticeably slowing every nixos-rebuild on the laptop. Replaced with the
+  # nix.optimise weekly timer above, which runs `nix-store --optimise` out of
+  # band.
+  #
+  # Tried: nixpkgs.config.allowBroken = true.
+  # Removed because it suppresses real evaluation errors. If a package needs it
+  # in the future, scope it narrowly with allowBrokenPredicate or override the
+  # offending package, rather than turning it on globally.
+  #
+  # Tried: hardware.bluetooth here.
+  # Bluetooth is a property of the physical machine, not the OS shape, so it
+  # was moved into each hardware/machines/<host>/default.nix that has a BT
+  # radio (currently bung-box and brojo-thinkpad-p14s-gen2).
+  #
+  # Tried: importing ./hyprland from base.nix.
+  # The active session is Plasma 6/Wayland on every current host. The Hyprland
+  # module is preserved on disk but no longer imported from the active path —
+  # see lib/system/hyprland/default.nix for the explanation.
 }

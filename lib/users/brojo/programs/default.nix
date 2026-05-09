@@ -6,7 +6,8 @@
     ./discord.nix
     ./dunst.nix
     ./rofi
-    ./hyprland
+    # ./hyprland is intentionally not imported — see ./hyprland/default.nix
+    # for the sequestered-but-preserved Hyprland user module.
     ./power-management.nix
     ./development.nix
     ./input-method.nix

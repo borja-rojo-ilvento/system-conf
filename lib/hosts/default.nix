@@ -67,7 +67,7 @@
       gamescopeSession.enable = true;
 
       # Ensure proper controller support
-      extest.enable = true;  # Enable EXTEST protocol for Steam Input
+      extest.enable = true; # Enable EXTEST protocol for Steam Input
 
       # Add NVIDIA libraries to Steam FHS environment
       extraPackages = with pkgs; [

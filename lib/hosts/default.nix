@@ -20,16 +20,6 @@
   # Productivity host services
   services.udev.packages = [ pkgs.ledger-udev-rules ];
 
-  services.flatpak.enable = true;
-
-  systemd.services.flatpak-repo = {
-    wantedBy = [ "multi-user.target" ];
-    path = [ pkgs.flatpak ];
-    script = ''
-      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    '';
-  };
-
   # NetworkManager credential storage
   networking.networkmanager.settings = {
     "main" = {
@@ -106,5 +96,13 @@
   # that file), and xdg.portal lives in lib/system/base.nix as part of the
   # systems-layer OS shape. The hosts layer is intended to wire composition
   # rather than introduce compositor-specific knobs.
+  #
+  # Tried: services.flatpak.enable plus a oneshot systemd.services.flatpak-repo
+  # that ran `flatpak remote-add --if-not-exists flathub …` on every boot.
+  # Introduced alongside the lutris/bottles/heroic gaming-launcher push but
+  # never used to install an app (flatpak list was empty). Once lutris and
+  # bottles were dropped, nothing on the system depended on flatpak. Removed
+  # because the unit also raced DNS at boot and surfaced as a recurring
+  # `systemctl --failed` entry.
 }
 

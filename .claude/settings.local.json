@@ -3,7 +3,8 @@
     "allow": [
       "WebSearch",
       "Bash(find:*)",
-      "Bash(curl -s https://api.github.com/repos/NixOS/nixos-hardware/contents/lenovo/thinkpad/p14s/intel/gen2)"
+      "Bash(curl -s https://api.github.com/repos/NixOS/nixos-hardware/contents/lenovo/thinkpad/p14s/intel/gen2)",
+      "Bash(nixos-rebuild build *)"
     ]
   },
   "enableAllProjectMcpServers": true,

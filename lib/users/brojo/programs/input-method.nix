@@ -14,6 +14,20 @@
 
   # Input method configuration files
   xdg.configFile = {
+    # Suppress Plasma's xdg-autostart of fcitx5. Home Manager's
+    # i18n.inputMethod already starts fcitx5 via the user systemd unit
+    # `fcitx5-daemon.service`; without this override Plasma *also* picks up
+    # `org.fcitx.Fcitx5.desktop` and starts a second daemon
+    # (`app-org.fcitx.Fcitx5@autostart.service`). The two race on the
+    # singleton DBus name and, when their store paths come from different
+    # generations, segfault the Qt fcitx5 input-context plugin loaded into
+    # plasmashell — taking the Plasma session down at login.
+    "autostart/org.fcitx.Fcitx5.desktop".text = ''
+      [Desktop Entry]
+      Type=Application
+      Hidden=true
+    '';
+
     # Fcitx5 main configuration
     "fcitx5/conf/classicui.conf".text = ''
       [Behavior]

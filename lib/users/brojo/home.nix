@@ -13,9 +13,10 @@
     firefox
     clang
     gnumake
-    cargo
-    rustc
-    rustfmt
+    # Rust toolchain (cargo, rustc, rustfmt, clippy, rust-analyzer, …) is
+    # managed via rustup, declared in lib/users/brojo/programs/neovim.nix.
+    # Listing the standalone packages here collides with rustup's proxy
+    # binaries in Home Manager's buildEnv.
     go
     nodejs
     wget

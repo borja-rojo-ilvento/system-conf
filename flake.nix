@@ -80,6 +80,7 @@
                 nix
                 nixos-rebuild
                 claude-code
+                lighttpd
               ];
 
               shellHook = ''

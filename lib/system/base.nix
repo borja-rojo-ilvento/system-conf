@@ -7,6 +7,7 @@
 
 {
   imports = [
+    ./core.nix
     ./hyprpolkitagent.nix
     ./power-management.nix
     ./xbox-controller.nix
@@ -14,55 +15,17 @@
     # for the sequestered-but-preserved Hyprland system module.
   ];
 
-  # Nix configuration
-  nix = {
-    settings = {
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      max-jobs = "auto";
-      cores = 0;
-      substituters = [ "https://hyprland.cachix.org" ];
-      trusted-substituters = [ "https://hyprland.cachix.org" ];
-      trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
-    };
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
-    };
-    optimise = {
-      automatic = true;
-      dates = [ "weekly" ];
-    };
+  # Hyprland binary cache — desktop hosts only; server builds don't use it.
+  nix.settings = {
+    substituters         = [ "https://hyprland.cachix.org" ];
+    trusted-substituters = [ "https://hyprland.cachix.org" ];
+    trusted-public-keys  = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
   };
 
-  hardware = {
-    steam-hardware.enable = true;
-  };
+  hardware.steam-hardware.enable = true;
 
-  # Boot configuration
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  # Basic networking
+  # Networking
   networking.networkmanager.enable = true;
-
-  # Locale and timezone
-  time.timeZone = "America/New_York";
-  i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
 
   # Audio system
   security.rtkit.enable = true;
@@ -74,42 +37,33 @@
     jack.enable = true;
   };
 
-  # Shell configuration
-  programs.zsh.enable = true;
-  users.defaultUserShell = pkgs.zsh;
-
   # Printing
   services.printing.enable = true;
 
-  # Nixpkgs configuration
-  nixpkgs.config = {
-    allowUnfree = true;
-  };
-
-  # System version
-  system.stateVersion = "24.05";
-
+  # Display manager and desktop environment
   services = {
-    xserver.enable = true; # Required by SDDM even with Wayland session.
-    displayManager = {
-      sddm = {
-        enable = true;
-        wayland.enable = true;
-      };
+    xserver.enable = true;
+    displayManager.sddm = {
+      enable = true;
+      wayland.enable = true;
     };
     desktopManager.plasma6.enable = true;
+    dbus.enable = true;
+    upower.enable = true;
   };
 
-  # Security services for desktop
+  # KWallet PAM integration
   security.pam.services = {
-    sddm.enableKwallet = true;
-    sddm.gnupg.enable = true;
+    sddm.enableKwallet  = true;
+    sddm.gnupg.enable   = true;
     login.enableKwallet = true;
     passwd.enableKwallet = true;
   };
 
-  # XDG portal — OS-level desktop integration; lives in the systems layer because
-  # it is wanted on every host regardless of which compositor a host composes in.
+  # Polkit for privilege escalation
+  security.polkit.enable = true;
+
+  # XDG portal — desktop integration for file pickers, screen share, etc.
   xdg.portal = {
     enable = true;
     extraPortals = [
@@ -118,15 +72,6 @@
     ];
     config.common.default = "hyprland";
   };
-
-  # D-Bus session management (enabled by default with desktop environment)
-  services.dbus.enable = true;
-
-  # Polkit for privilege escalation
-  security.polkit.enable = true;
-
-  # Battery monitoring and notifications
-  services.upower.enable = true;
 
   # ── Anex: prior approaches and why they were dropped ────────────────────────
   #
@@ -150,4 +95,8 @@
   # The active session is Plasma 6/Wayland on every current host. The Hyprland
   # module is preserved on disk but no longer imported from the active path —
   # see lib/system/hyprland/default.nix for the explanation.
+  #
+  # Tried: nix settings, boot loader, locale, zsh, allowUnfree, stateVersion
+  # directly in this file. Extracted to lib/system/core.nix so server hosts
+  # can import the same settings without pulling in the desktop closure.
 }

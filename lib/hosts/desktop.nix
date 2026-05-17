@@ -1,5 +1,7 @@
 {
   hostname ? "default",
+  localIP ? null,
+  gateway ? "192.168.0.1",
 }:
 {
   config,
@@ -16,6 +18,25 @@
 
   # Host identification
   networking.hostName = hostname;
+
+  # Static wired IP — only declared when localIP is passed from the flake.
+  # Uses a NetworkManager keyfile profile so WiFi management is unaffected.
+  networking.networkmanager.ensureProfiles.profiles = lib.mkIf (localIP != null) {
+    "static-ethernet" = {
+      connection = {
+        id = "static-ethernet";
+        type = "802-3-ethernet";
+        autoconnect = "true";
+        autoconnect-priority = "100";
+      };
+      ipv4 = {
+        method = "manual";
+        address1 = "${localIP}/24,${gateway}";
+        dns = "1.1.1.1;8.8.8.8;";
+      };
+      ipv6.method = "ignore";
+    };
+  };
 
   # Productivity host services
   services.udev.packages = [ pkgs.ledger-udev-rules ];

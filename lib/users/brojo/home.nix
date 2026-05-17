@@ -74,6 +74,8 @@
     jstest-gtk         # GUI tool for testing game controllers
   ];
 
+  services.ssh-agent.enable = true;
+
   home.stateVersion = "26.05";
 
 }

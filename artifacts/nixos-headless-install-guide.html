@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NixOS Headless Server Install Guide — nixos-anywhere + kexec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Serif:ital,wght@0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --bg-2: #161b24;
+    --bg-3: #1e2535;
+    --bg-4: #252d42;
+    --border: #2a3347;
+    --border-bright: #3d4f6b;
+    --text: #d4dbe8;
+    --text-muted: #7a8aaa;
+    --text-dim: #4a5a78;
+    --accent-blue: #4a9eff;
+    --accent-blue-dim: #1a3a5c;
+    --accent-teal: #2dd4bf;
+    --accent-teal-dim: #0f3330;
+    --accent-amber: #f59e0b;
+    --accent-amber-dim: #3a2800;
+    --accent-green: #4ade80;
+    --accent-green-dim: #0f2a1a;
+    --accent-red: #f87171;
+    --accent-red-dim: #2a0f0f;
+    --accent-purple: #a78bfa;
+    --accent-purple-dim: #1e1540;
+    --radius: 6px;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --serif: 'IBM Plex Serif', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .header-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: 1rem;
+  }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: 2.6rem;
+    line-height: 1.15;
+    color: #eef2ff;
+    margin-bottom: 1rem;
+  }
+
+  .header h1 strong {
+    font-weight: 500;
+    color: #ffffff;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: var(--radius);
+    border: 1px solid;
+    letter-spacing: 0.05em;
+  }
+
+  .tag-blue { color: var(--accent-blue); border-color: var(--accent-blue-dim); background: var(--accent-blue-dim); }
+  .tag-teal { color: var(--accent-teal); border-color: var(--accent-teal-dim); background: var(--accent-teal-dim); }
+  .tag-amber { color: var(--accent-amber); border-color: var(--accent-amber-dim); background: var(--accent-amber-dim); }
+  .tag-purple { color: var(--accent-purple); border-color: var(--accent-purple-dim); background: var(--accent-purple-dim); }
+
+  /* ─── TOC ─── */
+  .toc {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 2rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem 2rem;
+  }
+
+  .toc li {
+    counter-increment: toc;
+  }
+
+  .toc li a {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    transition: color 0.15s;
+  }
+
+  .toc li a:hover { color: var(--accent-blue); }
+
+  .toc li a::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    margin-bottom: 4rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .section-header h2 {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 1.2rem;
+    color: #eef2ff;
+    letter-spacing: -0.01em;
+  }
+
+  .section-accent {
+    display: inline-block;
+    width: 4px;
+    height: 1.2em;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .accent-blue { background: var(--accent-blue); }
+  .accent-teal { background: var(--accent-teal); }
+  .accent-amber { background: var(--accent-amber); }
+  .accent-green { background: var(--accent-green); }
+  .accent-purple { background: var(--accent-purple); }
+
+  /* ─── MENTAL MODEL BOX ─── */
+  .model-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-purple);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .model-box-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-purple);
+    margin-bottom: 0.6rem;
+  }
+
+  .model-box p {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-style: italic;
+    font-family: var(--serif);
+    line-height: 1.65;
+  }
+
+  /* ─── CALLOUT ─── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    display: flex;
+    gap: 0.75rem;
+    font-size: 14px;
+  }
+
+  .callout-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .callout-note { background: var(--accent-blue-dim); border: 1px solid #1e4a7a; color: #8ec8ff; }
+  .callout-warn { background: var(--accent-amber-dim); border: 1px solid #5a3e00; color: #fcd34d; }
+  .callout-tip { background: var(--accent-teal-dim); border: 1px solid #0f4040; color: #5eead4; }
+  .callout-danger { background: var(--accent-red-dim); border: 1px solid #4a1515; color: #fca5a5; }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block {
+    background: #090d14;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 1.25rem 0;
+    font-size: 13px;
+  }
+
+  .code-block-header {
+    background: var(--bg-3);
+    border-bottom: 1px solid var(--border);
+    padding: 0.45rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .code-block-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  .code-block pre {
+    font-family: var(--mono);
+    color: var(--text);
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    line-height: 1.7;
+    white-space: pre;
+  }
+
+  .kw { color: #7dd3fc; }
+  .str { color: #86efac; }
+  .cmt { color: #4a5a78; font-style: italic; }
+  .attr { color: var(--accent-teal); }
+  .val { color: #fca5a5; }
+  .punc { color: var(--text-dim); }
+  .fn { color: var(--accent-amber); }
+  .path { color: var(--accent-purple); }
+  .var { color: #c4b5fd; }
+
+  /* ─── STEPS ─── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 2.5rem;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 20px;
+    bottom: 20px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .step {
+    position: relative;
+    padding-bottom: 2rem;
+  }
+
+  .step:last-child { padding-bottom: 0; }
+
+  .step-dot {
+    position: absolute;
+    left: -2.5rem;
+    top: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border-bright);
+    background: var(--bg-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    z-index: 1;
+  }
+
+  .step-dot.active {
+    border-color: var(--accent-blue);
+    background: var(--accent-blue-dim);
+    color: var(--accent-blue);
+  }
+
+  .step h4 {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 14px;
+    color: #eef2ff;
+    margin-bottom: 0.4rem;
+  }
+
+  .step p, .step ul {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .step ul {
+    margin-top: 0.5rem;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  /* ─── ARCH DIAGRAM ─── */
+  .arch {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .arch-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .arch-node {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    text-align: center;
+  }
+
+  .arch-node-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+
+  .arch-node-val {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .arch-arrow {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 0.1rem 0;
+  }
+
+  /* ─── KV GRID ─── */
+  .kv-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.6rem 2rem;
+    font-size: 14px;
+    padding: 1rem 0;
+  }
+
+  .kv-key {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    padding-top: 1px;
+  }
+
+  .kv-val { color: var(--text-muted); }
+
+  /* ─── INLINE CODE ─── */
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent-teal);
+  }
+
+  /* ─── CHECKLIST ─── */
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 14px;
+    color: var(--text-muted);
+    padding: 0.5rem 0;
+  }
+
+  .checklist li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+
+  .checklist li::before {
+    content: '□';
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--border-bright);
+    flex-shrink: 0;
+  }
+
+  p + p { margin-top: 0.75rem; }
+
+  p { color: var(--text-muted); font-size: 14.5px; }
+
+  h3 {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 2rem 0 0.75rem;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+
+  .card-sm {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+  }
+
+  .card-sm-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-sm p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 600px) {
+    .toc ol, .two-col { grid-template-columns: 1fr; }
+    .header h1 { font-size: 1.8rem; }
+    .page { padding: 2rem 1.25rem 4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-eyebrow">field guide · nixos + flakes</div>
+    <h1>Installing NixOS<br><strong>USB-free, Fully Remote via nixos-anywhere</strong></h1>
+    <p style="color: var(--text-muted); max-width: 580px; margin-top: 0.75rem; font-size: 15px;">
+      A guided walkthrough for provisioning a small headless server—running services like Gitea—without a USB stick, monitor, or keyboard. The entire install is driven from your local machine using <code>nixos-anywhere</code>, <code>kexec</code>, and <code>disko</code>.
+    </p>
+    <div class="header-meta">
+      <span class="tag tag-blue">NixOS</span>
+      <span class="tag tag-teal">Flakes</span>
+      <span class="tag tag-amber">nixos-anywhere</span>
+      <span class="tag tag-purple">disko</span>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc" aria-label="Table of contents">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#prereqs">Prerequisite knowledge</a></li>
+      <li><a href="#mental-models">Mental models to adopt</a></li>
+      <li><a href="#prep">Preparation</a></li>
+      <li><a href="#flake-structure">Flake, disko &amp; host structure</a></li>
+      <li><a href="#execution">Execution</a></li>
+      <li><a href="#testing">Testing &amp; verification</a></li>
+    </ol>
+  </nav>
+
+
+  <!-- ────────────────────────────────────────────
+       SECTION 1 — PREREQUISITES
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="prereqs">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-accent accent-blue"></span>
+      <h2>Prerequisite knowledge</h2>
+    </div>
+
+    <p>You don't need to be a sysadmin, but a handful of concepts are load-bearing for everything that follows. Understanding them now prevents confusion later.</p>
+
+    <h3>Networking basics</h3>
+    <p>Headless installation means your only interface is a network connection. You need to understand:</p>
+    <ul class="checklist">
+      <li><strong>IP address</strong> — the numeric address your machine gets on your local network (e.g. <code>192.168.1.50</code>). You'll use this to SSH in and to run nixos-anywhere.</li>
+      <li><strong>DHCP vs static IP</strong> — DHCP means your router assigns the address automatically (it can change); a static IP is pinned and reliable for a server.</li>
+      <li><strong>SSH (Secure Shell)</strong> — the protocol that gives you a remote terminal session. nixos-anywhere communicates entirely over SSH.</li>
+      <li><strong>Ethernet required</strong> — nixos-anywhere does not support WiFi. The target machine must be on a wired connection during install.</li>
+    </ul>
+
+    <h3>New concepts for this method</h3>
+    <ul class="checklist">
+      <li><strong>kexec</strong> — a Linux kernel feature that loads and boots a new kernel from memory, replacing the running OS without a reboot cycle through the BIOS. nixos-anywhere uses this to swap the target's current OS for a NixOS installer environment, entirely over SSH, with no USB involved.</li>
+      <li><strong>nixos-anywhere</strong> — a community tool that orchestrates the full install: it kexecs a NixOS installer onto the target, runs disko to format the disk, copies your flake config, runs <code>nixos-install</code>, then reboots. One command from your local machine.</li>
+      <li><strong>disko</strong> — a NixOS module that declares disk partition layouts in Nix. nixos-anywhere requires disko because it needs to know how to partition the disk declaratively, without you running <code>parted</code> by hand. Your partition layout becomes part of your flake repo—reproducible and version-controlled.</li>
+    </ul>
+
+    <div class="model-box">
+      <div class="model-box-title">The key shift in mental model</div>
+      <p>In the USB-based approach, you physically prepare the target (boot media, keyboard, parted). In this approach, the target is treated as a passive recipient—it just needs to be running <em>any</em> Linux and be reachable over SSH. Your local machine is the operator. Everything else is automated.</p>
+    </div>
+
+    <h3>NixOS-specific concepts</h3>
+    <ul class="checklist">
+      <li><strong>Declarative configuration</strong> — you describe what the system <em>should be</em>; NixOS makes it so. Unlike Debian/Ubuntu where you imperatively install packages, NixOS state is fully described in .nix files.</li>
+      <li><strong>nixos-rebuild switch</strong> — the command that reads your configuration and applies it to a running system. Used for all ongoing deployments after the initial install.</li>
+      <li><strong>Flake outputs</strong> — a flake's <code>outputs</code> function is where <code>nixosConfigurations</code> lives. Each key in that attrset is a named system you can build and deploy to.</li>
+    </ul>
+
+    <h3>What you need on your local machine</h3>
+    <div class="kv-grid">
+      <span class="kv-key">ssh</span><span class="kv-val">Client for verifying initial connectivity to the target. Ships with macOS/Linux.</span>
+      <span class="kv-key">nix</span><span class="kv-val">Your local Nix installation. nixos-anywhere is run via <code>nix run</code> — no separate install needed.</span>
+      <span class="kv-key">git</span><span class="kv-val">Your flake repo is tracked in git. Nix flakes refuse to include untracked files — everything must be committed.</span>
+    </div>
+
+    <h3>What the target machine needs</h3>
+    <div class="kv-grid">
+      <span class="kv-key">any Linux</span><span class="kv-val">Ubuntu, Debian, Arch — whatever came preinstalled. nixos-anywhere kexecs over it.</span>
+      <span class="kv-key">SSH access</span><span class="kv-val">A user you can SSH into as root, or a user with passwordless sudo. Key auth preferred.</span>
+      <span class="kv-key">≥ 1 GB RAM</span><span class="kv-val">kexec loads the NixOS installer entirely into memory. Less than 1 GB may cause failures unpacking the initrd.</span>
+      <span class="kv-key">ethernet</span><span class="kv-val">WiFi is not supported. Must be on a wired connection.</span>
+      <span class="kv-key">x86_64</span><span class="kv-val">The default kexec image targets x86_64-linux. aarch64 is possible with a custom kexec image — see the nixos-anywhere docs.</span>
+    </div>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       SECTION 2 — MENTAL MODELS
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="mental-models">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-accent accent-purple"></span>
+      <h2>Mental models to adopt</h2>
+    </div>
+
+    <p>These are the conceptual frames that make this approach feel <em>logical</em> rather than magical. Each one pays dividends across your entire Nix journey.</p>
+
+    <div class="two-col">
+      <div class="card-sm">
+        <div class="card-sm-title">kexec is a kernel transplant</div>
+        <p>kexec doesn't reboot the machine in the traditional sense. It replaces the running kernel in-place from memory. nixos-anywhere uploads a minimal NixOS installer image and triggers kexec — the machine pivots from Ubuntu (or whatever) directly into NixOS installer space. Your SSH session drops and reconnects. That's normal.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">The target's OS is disposable</div>
+        <p>Whatever is currently on the target machine — Ubuntu, Debian, a fresh-out-of-box OS — is irrelevant. nixos-anywhere obliterates it. The only thing that matters about the initial OS is that it's running, reachable over SSH, and supports kexec (essentially any x86_64 Linux).</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Disk layout is code now</div>
+        <p>disko replaces the manual <code>parted</code> steps. You declare partition layout as a Nix module, commit it alongside your host config, and nixos-anywhere applies it. The disk layout is reproducible, version-controlled, and self-documenting — not a set of commands you'd have to remember or reconstruct.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Configuration before application</div>
+        <p>Write the full system config — SSH, users, services, disk layout — <em>before</em> running nixos-anywhere. The entire system is stamped in one shot. Your server boots fully configured and ready, not in a half-done state waiting for you to run more commands.</p>
+      </div>
+    </div>
+
+    <div class="model-box">
+      <div class="model-box-title">The deployment lifecycle</div>
+      <p>Confirm SSH access to target → write full config (disko + host + users) → commit to GitHub → run one nixos-anywhere command from local → machine reboots as NixOS → all future changes are nixos-rebuild --target-host from local. You never touch the target machine physically.</p>
+    </div>
+
+    <h3>Ongoing deployment: pushing from local</h3>
+    <p>This guide uses the push model throughout — your local machine is always the operator. After the initial install, config changes are applied with a single command:</p>
+
+    <div class="arch">
+      <div class="arch-row">
+        <div class="arch-node" style="border-color: var(--accent-blue-dim);">
+          <div class="arch-node-label" style="color: var(--accent-blue);">initial install</div>
+          <div class="arch-node-val" style="font-size: 12px; font-family: var(--mono); color: var(--text-muted);">nix run nixos-anywhere</div>
+        </div>
+        <div class="arch-node" style="border-color: var(--accent-teal-dim);">
+          <div class="arch-node-label" style="color: var(--accent-teal);">ongoing changes</div>
+          <div class="arch-node-val" style="font-size: 12px; font-family: var(--mono); color: var(--text-muted);">nixos-rebuild --target-host</div>
+        </div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-node">
+          <div class="arch-node-label">builds on</div>
+          <div class="arch-node-val" style="font-size: 12px; color: var(--text-muted);">Local machine, pushed to target</div>
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-label">builds on</div>
+          <div class="arch-node-val" style="font-size: 12px; color: var(--text-muted);">Local machine, pushed to target</div>
+        </div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-node">
+          <div class="arch-node-label">target needs</div>
+          <div class="arch-node-val" style="font-size: 12px; color: var(--text-muted);">Any Linux + SSH</div>
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-label">target needs</div>
+          <div class="arch-node-val" style="font-size: 12px; color: var(--text-muted);">Running NixOS + SSH + sudo</div>
+        </div>
+      </div>
+    </div>
+    <p>The target never needs git, nix, or your repo cloned onto it. Your local machine holds the full picture and pushes changes out.</p>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       SECTION 3 — PREPARATION
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="prep">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-accent accent-amber"></span>
+      <h2>Preparation</h2>
+    </div>
+
+    <p>There is no USB stick to prepare. Preparation here means confirming your target is reachable and your local environment is ready to push to it.</p>
+
+    <h3>1. Confirm SSH access to the target</h3>
+    <p>Boot the target machine with whatever OS it has, make sure it's on ethernet, and confirm you can SSH in. This is your only physical interaction with the machine.</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local machine</span></div>
+      <pre><span class="cmt"># Find the target's IP from your router's DHCP table, or run on the target itself:</span>
+<span class="cmt">#   ip addr show</span>
+
+<span class="fn">ssh</span> root@&lt;target-ip&gt;
+<span class="cmt"># or a sudo-capable user:</span>
+<span class="fn">ssh</span> youruser@&lt;target-ip&gt;</pre>
+    </div>
+
+    <div class="callout callout-note">
+      <span class="callout-icon">i</span>
+      <span>nixos-anywhere needs to either log in as <code>root</code> directly, or as a user with <strong>passwordless sudo</strong>. If the target's existing OS has a <code>sudo</code> user but requires a password, either temporarily grant passwordless sudo (<code>NOPASSWD: ALL</code> in sudoers) or use the <code>--env-password</code> flag with nixos-anywhere.</span>
+    </div>
+
+    <h3>2. Copy your SSH public key to the target</h3>
+    <p>nixos-anywhere uses your SSH key to authenticate. Make sure it's installed on the target now, so there are no password prompts during the automated install:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local machine</span></div>
+      <pre><span class="fn">ssh-copy-id</span> root@&lt;target-ip&gt;
+<span class="cmt"># or for a non-root user:</span>
+<span class="fn">ssh-copy-id</span> youruser@&lt;target-ip&gt;</pre>
+    </div>
+
+    <h3>3. Find the target disk name</h3>
+    <p>You'll need this for your disko config. SSH in and run:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">remote shell</span></div>
+      <pre><span class="fn">lsblk</span> -d -o NAME,SIZE,TYPE,MODEL
+<span class="cmt"># Look for your main disk — likely /dev/sda, /dev/nvme0n1, etc.
+# Note the device path. You'll put it in disk-config.nix.</span></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">▲</span>
+      <span>nixos-anywhere + disko will <strong>completely wipe</strong> the target disk. Confirm you have the right device path before proceeding. There is no undo.</span>
+    </div>
+
+    <h3>4. Verify kexec support</h3>
+    <p>Almost all x86_64 Linux machines support kexec, but it takes two seconds to confirm:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">remote shell</span></div>
+      <pre><span class="fn">grep</span> CONFIG_KEXEC /boot/config-$(uname -r)
+<span class="cmt"># Should print: CONFIG_KEXEC=y</span>
+<span class="cmt"># If the file doesn't exist, try: zcat /proc/config.gz | grep CONFIG_KEXEC</span></pre>
+    </div>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       SECTION 4 — FLAKE STRUCTURE
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="flake-structure">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-accent accent-teal"></span>
+      <h2>Flake, disko &amp; host structure</h2>
+    </div>
+
+    <p>Before running nixos-anywhere, write the full configuration. This is the NixOS way: declare intent before applying it. We'll add a new host to your existing flake repo — let's call the machine <code>gitara</code>.</p>
+
+    <h3>Repository layout</h3>
+    <p>The key addition compared to a standard host is <code>disk-config.nix</code> — the disko partition layout that lives beside the hardware config:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">directory layout</span></div>
+      <pre><span class="path">lib/</span>
+├── <span class="path">hardware/machines/</span>
+│   └── <span class="path">gitara/</span>
+│       ├── <span class="path">default.nix</span>
+│       ├── <span class="path">disk-config.nix</span>          <span class="cmt"># NEW: disko partition layout</span>
+│       └── <span class="path">hardware-configuration.nix</span>  <span class="cmt"># stub now; generated by nixos-anywhere at install</span>
+└── <span class="path">hosts/</span>
+    ├── <span class="path">default.nix</span>                  <span class="cmt"># your existing productivity host</span>
+    └── <span class="path">server.nix</span>                   <span class="cmt"># NEW: server host type</span></pre>
+    </div>
+
+    <h3>Add disko to your flake inputs</h3>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">flake.nix · updated inputs</span></div>
+      <pre>inputs <span class="punc">= {</span>
+  nixpkgs<span class="punc">.</span>url <span class="punc">=</span> <span class="str">"github:nixos/nixpkgs?ref=nixos-unstable"</span><span class="punc">;</span>
+  nixos-hardware<span class="punc">.</span>url <span class="punc">=</span> <span class="str">"github:nixos/nixos-hardware"</span><span class="punc">;</span>
+  home-manager <span class="punc">= {</span>
+    url <span class="punc">=</span> <span class="str">"github:nix-community/home-manager"</span><span class="punc">;</span>
+    inputs<span class="punc">.</span>nixpkgs<span class="punc">.</span>follows <span class="punc">=</span> <span class="str">"nixpkgs"</span><span class="punc">;</span>
+  <span class="punc">};</span>
+  disko <span class="punc">= {</span>
+    url <span class="punc">=</span> <span class="str">"github:nix-community/disko"</span><span class="punc">;</span>
+    inputs<span class="punc">.</span>nixpkgs<span class="punc">.</span>follows <span class="punc">=</span> <span class="str">"nixpkgs"</span><span class="punc">;</span>
+  <span class="punc">};</span>
+<span class="punc">};</span></pre>
+    </div>
+
+    <h3>The disk config (disko)</h3>
+    <p>Create <code>lib/hardware/machines/gitara/disk-config.nix</code>. This replaces all manual <code>parted</code> and <code>mkfs</code> commands. Replace <code>/dev/sda</code> with the device path you noted during preparation:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">lib/hardware/machines/gitara/disk-config.nix</span></div>
+      <pre><span class="punc">{</span> <span class="attr">...</span> <span class="punc">}:</span>
+<span class="punc">{</span>
+  disko<span class="punc">.</span>devices<span class="punc">.</span>disk<span class="punc">.</span>main <span class="punc">= {</span>
+    device <span class="punc">=</span> <span class="str">"/dev/sda"</span><span class="punc">;</span>  <span class="cmt"># adjust: /dev/nvme0n1 for NVMe</span>
+    type <span class="punc">=</span> <span class="str">"disk"</span><span class="punc">;</span>
+    content <span class="punc">= {</span>
+      type <span class="punc">=</span> <span class="str">"gpt"</span><span class="punc">;</span>
+      partitions <span class="punc">= {</span>
+        boot <span class="punc">= {</span>
+          size <span class="punc">=</span> <span class="str">"512M"</span><span class="punc">;</span>
+          type <span class="punc">=</span> <span class="str">"EF00"</span><span class="punc">;</span>  <span class="cmt"># EFI system partition</span>
+          content <span class="punc">= {</span>
+            type <span class="punc">=</span> <span class="str">"filesystem"</span><span class="punc">;</span>
+            format <span class="punc">=</span> <span class="str">"vfat"</span><span class="punc">;</span>
+            mountpoint <span class="punc">=</span> <span class="str">"/boot"</span><span class="punc">;</span>
+          <span class="punc">};</span>
+        <span class="punc">};</span>
+        root <span class="punc">= {</span>
+          size <span class="punc">=</span> <span class="str">"100%"</span><span class="punc">;</span>
+          content <span class="punc">= {</span>
+            type <span class="punc">=</span> <span class="str">"filesystem"</span><span class="punc">;</span>
+            format <span class="punc">=</span> <span class="str">"ext4"</span><span class="punc">;</span>
+            mountpoint <span class="punc">=</span> <span class="str">"/"</span><span class="punc">;</span>
+          <span class="punc">};</span>
+        <span class="punc">};</span>
+      <span class="punc">};</span>
+    <span class="punc">};</span>
+  <span class="punc">};</span>
+<span class="punc">}</span></pre>
+    </div>
+
+    <h3>The hardware machine config</h3>
+    <p>Create <code>lib/hardware/machines/gitara/default.nix</code>. It imports the disko module, the disk config, and a stub hardware-configuration that nixos-anywhere will replace:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">lib/hardware/machines/gitara/default.nix</span></div>
+      <pre><span class="punc">{</span> <span class="attr">config</span>, <span class="attr">lib</span>, <span class="attr">pkgs</span>, <span class="attr">disko</span>, <span class="attr">...</span> <span class="punc">}:</span>
+<span class="punc">{</span>
+  imports <span class="punc">= [</span>
+    disko<span class="punc">.</span>nixosModules<span class="punc">.</span>disko
+    <span class="path">./disk-config.nix</span>
+    <span class="path">./hardware-configuration.nix</span>
+  <span class="punc">];</span>
+  hardware<span class="punc">.</span>enableAllFirmware <span class="punc">=</span> <span class="kw">true</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">▲</span>
+      <span>The <code>hardware-configuration.nix</code> import will fail evaluation if the file doesn't exist. Create a stub before committing: a file containing only <code>{ ... }: {}</code>. nixos-anywhere overwrites it during install with the <code>--generate-hardware-config</code> flag.</span>
+    </div>
+
+    <h3>The server host type</h3>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">lib/hosts/server.nix</span></div>
+      <pre><span class="punc">{</span> <span class="attr">hostname</span> ? <span class="str">"server"</span> <span class="punc">}:</span>
+<span class="punc">{</span> <span class="attr">config</span>, <span class="attr">lib</span>, <span class="attr">pkgs</span>, <span class="attr">...</span> <span class="punc">}:</span>
+<span class="punc">{</span>
+  imports <span class="punc">= [</span> <span class="path">../system/base-server.nix</span> <span class="punc">];</span>
+  networking<span class="punc">.</span>hostName <span class="punc">=</span> hostname<span class="punc">;</span>
+  networking<span class="punc">.</span>firewall<span class="punc">.</span>allowedTCPPorts <span class="punc">= [</span> <span class="val">22</span> <span class="val">3000</span> <span class="punc">];</span>
+
+  services<span class="punc">.</span>gitea <span class="punc">= {</span>
+    enable <span class="punc">=</span> <span class="kw">true</span><span class="punc">;</span>
+    settings<span class="punc">.</span>server <span class="punc">= {</span>
+      HTTP_PORT <span class="punc">=</span> <span class="val">3000</span><span class="punc">;</span>
+      DOMAIN <span class="punc">=</span> <span class="str">"gitara.local"</span><span class="punc">;</span>
+      ROOT_URL <span class="punc">=</span> <span class="str">"http://gitara.local:3000/"</span><span class="punc">;</span>
+    <span class="punc">};</span>
+  <span class="punc">};</span>
+
+  users<span class="punc">.</span>users<span class="punc">.</span>deploy <span class="punc">= {</span>
+    isNormalUser <span class="punc">=</span> <span class="kw">true</span><span class="punc">;</span>
+    extraGroups <span class="punc">= [</span> <span class="str">"wheel"</span> <span class="punc">];</span>
+    openssh<span class="punc">.</span>authorizedKeys<span class="punc">.</span>keys <span class="punc">= [</span>
+      <span class="str">"ssh-ed25519 AAAAC3... your-public-key-here"</span>
+    <span class="punc">];</span>
+  <span class="punc">};</span>
+
+  <span class="cmt"># Required: nixos-rebuild --target-host needs passwordless sudo</span>
+  security<span class="punc">.</span>sudo<span class="punc">.</span>wheelNeedsPassword <span class="punc">=</span> <span class="kw">false</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+
+    <h3>A minimal server base config</h3>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">lib/system/base-server.nix</span></div>
+      <pre><span class="punc">{</span> <span class="attr">config</span>, <span class="attr">lib</span>, <span class="attr">pkgs</span>, <span class="attr">...</span> <span class="punc">}:</span>
+<span class="punc">{</span>
+  nix<span class="punc">.</span>settings<span class="punc">.</span>experimental-features <span class="punc">= [</span> <span class="str">"nix-command"</span> <span class="str">"flakes"</span> <span class="punc">];</span>
+  nix<span class="punc">.</span>settings<span class="punc">.</span>auto-optimise-store <span class="punc">=</span> <span class="kw">true</span><span class="punc">;</span>
+  boot<span class="punc">.</span>loader<span class="punc">.</span>systemd-boot<span class="punc">.</span>enable <span class="punc">=</span> <span class="kw">true</span><span class="punc">;</span>
+  boot<span class="punc">.</span>loader<span class="punc">.</span>efi<span class="punc">.</span>canTouchEfiVariables <span class="punc">=</span> <span class="kw">true</span><span class="punc">;</span>
+  networking<span class="punc">.</span>networkmanager<span class="punc">.</span>enable <span class="punc">=</span> <span class="kw">true</span><span class="punc">;</span>
+  time<span class="punc">.</span>timeZone <span class="punc">=</span> <span class="str">"America/New_York"</span><span class="punc">;</span>
+  i18n<span class="punc">.</span>defaultLocale <span class="punc">=</span> <span class="str">"en_US.UTF-8"</span><span class="punc">;</span>
+
+  <span class="cmt"># SSH — the only way in. Do not omit.</span>
+  services<span class="punc">.</span>openssh <span class="punc">= {</span>
+    enable <span class="punc">=</span> <span class="kw">true</span><span class="punc">;</span>
+    settings<span class="punc">.</span>PasswordAuthentication <span class="punc">=</span> <span class="kw">false</span><span class="punc">;</span>
+    settings<span class="punc">.</span>PermitRootLogin <span class="punc">=</span> <span class="str">"no"</span><span class="punc">;</span>
+  <span class="punc">};</span>
+
+  nixpkgs<span class="punc">.</span>config<span class="punc">.</span>allowUnfree <span class="punc">=</span> <span class="kw">true</span><span class="punc">;</span>
+  environment<span class="punc">.</span>systemPackages <span class="punc">=</span> <span class="kw">with</span> pkgs<span class="punc">; [</span> git vim curl wget <span class="punc">];</span>
+  system<span class="punc">.</span>stateVersion <span class="punc">=</span> <span class="str">"24.05"</span><span class="punc">;</span>
+<span class="punc">}</span></pre>
+    </div>
+
+    <h3>Wire everything into flake.nix</h3>
+    <p><code>disko</code> must be passed via <code>specialArgs</code> so the hardware module can receive it as a function argument:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">flake.nix · gitara system</span></div>
+      <pre>outputs <span class="punc">=</span> <span class="punc">{</span> <span class="attr">self</span>, <span class="attr">nixpkgs</span>, <span class="attr">home-manager</span>, <span class="attr">disko</span>, <span class="attr">...</span> <span class="punc">}@inputs:</span>
+<span class="punc">{</span>
+  nixosConfigurations <span class="punc">= {</span>
+    jaro <span class="punc">=</span> <span class="punc">...;</span>  <span class="cmt"># unchanged</span>
+
+    gitara <span class="punc">=</span> nixpkgs<span class="punc">.</span>lib<span class="punc">.</span>nixosSystem <span class="punc">{</span>
+      system <span class="punc">=</span> <span class="str">"x86_64-linux"</span><span class="punc">;</span>
+      specialArgs <span class="punc">= {</span>
+        <span class="kw">inherit</span> <span class="punc">(</span>inputs<span class="punc">)</span> nixos-hardware disko<span class="punc">;</span>
+      <span class="punc">};</span>
+      modules <span class="punc">= [</span>
+        <span class="path">./lib/hardware/machines/gitara</span>
+        <span class="punc">(</span><span class="fn">import</span> <span class="path">./lib/hosts/server.nix</span> <span class="punc">{</span> hostname <span class="punc">=</span> <span class="str">"gitara"</span><span class="punc">;</span> <span class="punc">})</span>
+      <span class="punc">];</span>
+    <span class="punc">};</span>
+  <span class="punc">};</span>
+<span class="punc">};</span></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">→</span>
+      <span>Commit everything at this point — including the stub <code>hardware-configuration.nix</code>. Push to GitHub. nixos-anywhere can reference your flake directly from GitHub (<code>github:youruser/system-conf#gitara</code>), so the target never needs the repo on disk.</span>
+    </div>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       SECTION 5 — EXECUTION
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="execution">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-accent accent-green"></span>
+      <h2>Execution</h2>
+    </div>
+
+    <p>With your config committed and SSH access confirmed, the entire install is a single command from your local machine. nixos-anywhere handles kexec, disk formatting, installation, and reboot automatically.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-dot active">1</div>
+        <h4>Validate your config builds cleanly</h4>
+        <p>Before touching the target, make sure your flake evaluates:</p>
+        <div class="code-block" style="margin-top: 0.5rem;">
+          <div class="code-block-header"><span class="code-block-label">local</span></div>
+          <pre><span class="fn">nix flake check</span>
+<span class="fn">nixos-rebuild build</span> --flake .#gitara
+<span class="cmt"># Catches any evaluation or build errors before the point of no return.</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-dot active">2</div>
+        <h4>Run nixos-anywhere</h4>
+        <p>This single command kexecs a NixOS installer onto the target, runs disko to partition the disk, installs your configuration, generates hardware-configuration.nix locally, and reboots the machine:</p>
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-label">local · the install command</span></div>
+          <pre><span class="fn">nix run</span> github:nix-community/nixos-anywhere -- \
+  --flake .#gitara \
+  --generate-hardware-config nixos-generate-config \
+    ./lib/hardware/machines/gitara/hardware-configuration.nix \
+  root@&lt;target-ip&gt;</pre>
+        </div>
+        <p>What happens in sequence: nixos-anywhere SSHes in → uploads a kexec tarball → triggers kexec (the target's kernel is replaced in-memory with a NixOS installer; your SSH session will drop for ~30 seconds) → reconnects → runs disko to partition and format the disk → runs <code>nixos-install</code> with your flake → generates <code>hardware-configuration.nix</code> and writes it to your local repo → reboots the machine into NixOS.</p>
+        <div class="callout callout-note" style="margin-top: 0.75rem;">
+          <span class="callout-icon">i</span>
+          <span>The SSH session drop during kexec is expected — not a failure. nixos-anywhere waits and reconnects automatically. The whole process typically takes 5–15 minutes depending on download speed.</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-dot active">3</div>
+        <h4>Commit the generated hardware config</h4>
+        <p>nixos-anywhere wrote <code>hardware-configuration.nix</code> into your local repo. Commit it so your flake is fully self-contained and repeatable:</p>
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-label">local</span></div>
+          <pre><span class="fn">git</span> add lib/hardware/machines/gitara/hardware-configuration.nix
+<span class="fn">git</span> commit -m <span class="str">"feat: add gitara hardware configuration"</span>
+<span class="fn">git</span> push</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-dot">4</div>
+        <h4>Verify the machine booted into NixOS</h4>
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-label">local</span></div>
+          <pre><span class="fn">ssh</span> deploy@&lt;target-ip&gt;
+<span class="cmt"># Should connect with your key — no password prompt</span>
+
+<span class="fn">uname -a</span>
+<span class="cmt"># Should show NixOS kernel</span>
+
+<span class="fn">systemctl</span> status gitea sshd</pre>
+        </div>
+        <p>SSH running, Gitea running, your <code>deploy</code> user accessible. The machine is live.</p>
+      </div>
+
+    </div>
+
+    <hr class="divider">
+
+    <h3>Ongoing deployment workflow</h3>
+    <p>All future config changes are pushed from your local machine. The target never needs git or your repo:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local · all future deploys</span></div>
+      <pre><span class="cmt"># 1. Edit config locally</span>
+vim lib/hosts/server.nix
+
+<span class="cmt"># 2. Commit and push to GitHub</span>
+<span class="fn">git</span> add -A && git commit -m <span class="str">"feat: enable gitea backup"</span>
+<span class="fn">git</span> push
+
+<span class="cmt"># 3. Build locally, push and activate on target</span>
+<span class="fn">nixos-rebuild switch</span> \
+  --flake .#gitara \
+  --target-host deploy@&lt;target-ip&gt; \
+  --use-remote-sudo</pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">→</span>
+      <span>nixos-rebuild builds the closure on your local machine (using your faster hardware and local Nix store cache), then copies only the changed derivations to the target and activates them. The target doesn't need to build anything itself.</span>
+    </div>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       SECTION 6 — TESTING
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="testing">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-accent accent-teal"></span>
+      <h2>Testing &amp; verification</h2>
+    </div>
+
+    <p>Testing in NixOS has two distinct phases: validating your config before deployment, and verifying the running system afterward. nixos-anywhere also has a built-in VM test mode that's worth knowing about.</p>
+
+    <h3>Before deploying — validate the config</h3>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot active">A</div>
+        <h4>Evaluate the flake without building</h4>
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-label">local</span></div>
+          <pre><span class="fn">nix flake check</span>
+<span class="cmt"># Evaluates all outputs for type errors and import errors.
+# Catches typos and missing module references before touching the server.</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-dot active">B</div>
+        <h4>Test disko layout in a VM (nixos-anywhere built-in)</h4>
+        <p>nixos-anywhere can run your config in a throwaway VM and apply the disko partition script, verifying the disk layout is valid before touching real hardware:</p>
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-label">local</span></div>
+          <pre><span class="fn">nix run</span> github:nix-community/nixos-anywhere -- \
+  --flake .#gitara \
+  --vm-test
+<span class="cmt"># Boots a VM, runs disko, and installs your config inside it.
+# No hardware touched. Surfaces disko errors and config build failures.</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-dot active">C</div>
+        <h4>Build the closure locally</h4>
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-label">local</span></div>
+          <pre><span class="fn">nixos-rebuild build</span> --flake .#gitara
+<span class="cmt"># Builds the full system closure and symlinks it to ./result.
+# Confirms the config builds successfully. No side effects.</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-dot">D</div>
+        <h4>Dry activation (on the running server, for future changes)</h4>
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-label">local · after initial install</span></div>
+          <pre><span class="fn">nixos-rebuild dry-activate</span> \
+  --flake .#gitara \
+  --target-host deploy@&lt;target-ip&gt; \
+  --use-remote-sudo
+<span class="cmt"># Shows which systemd units would start/stop/restart
+# without applying the change. Useful before any significant update.</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <h3>After deploying — verify the running system</h3>
+    <ul class="checklist">
+      <li>SSH connects as the <code>deploy</code> user with your key</li>
+      <li><code>systemctl status gitea</code> shows <code>active (running)</code></li>
+      <li><code>curl http://localhost:3000</code> returns Gitea's HTML</li>
+      <li><code>systemctl status sshd</code> confirms SSH daemon is active</li>
+      <li><code>journalctl -u gitea -n 50</code> shows clean startup logs with no errors</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">remote · quick health check</span></div>
+      <pre><span class="cmt"># Service status</span>
+<span class="fn">systemctl</span> status gitea sshd networkmanager
+
+<span class="cmt"># Check Gitea is reachable internally</span>
+<span class="fn">curl</span> -s http://localhost:3000 | <span class="fn">grep</span> -o "&lt;title&gt;.*&lt;/title&gt;"
+
+<span class="cmt"># Check which generation you're on</span>
+<span class="fn">nixos-rebuild</span> list-generations
+
+<span class="cmt"># View recent system logs</span>
+<span class="fn">journalctl</span> -b --since <span class="str">"10 minutes ago"</span></pre>
+    </div>
+
+    <h3>Rollback — when things go wrong</h3>
+    <p>NixOS's killer feature for server management: every <code>nixos-rebuild switch</code> creates a new generation. Rolling back is instantaneous:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">remote · rollback</span></div>
+      <pre><span class="cmt"># Roll back to the previous generation</span>
+<span class="fn">sudo nixos-rebuild switch</span> --rollback
+
+<span class="cmt"># Or choose a specific generation</span>
+<span class="fn">sudo</span> /run/current-system/bin/switch-to-configuration switch
+<span class="fn">nixos-rebuild list-generations</span>
+<span class="fn">sudo nix-env</span> --switch-generation &lt;N&gt; -p /nix/var/nix/profiles/system</pre>
+    </div>
+
+    <div class="model-box">
+      <div class="model-box-title">The deeper takeaway</div>
+      <p>Every generation is a complete, immutable snapshot of your system. Unlike traditional servers where you might spend hours debugging a bad upgrade, NixOS rollbacks are atomic—the system either fully reflects a generation, or it doesn't. For a self-hosted server, this is an extraordinary safety net.</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">→</span>
+      <span>Access Gitea from your local network by navigating to <code>http://&lt;server-ip&gt;:3000</code> in a browser. On first visit, Gitea presents a setup wizard where you'll create the admin account. Configure your <code>ROOT_URL</code> in the Nix config to match however you're accessing it.</span>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

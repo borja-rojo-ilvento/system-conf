@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 0 — Network Discovery & OS Diagnosis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Serif:ital,wght@0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --bg-2: #161b24;
+    --bg-3: #1e2535;
+    --bg-4: #252d42;
+    --border: #2a3347;
+    --border-bright: #3d4f6b;
+    --text: #d4dbe8;
+    --text-muted: #7a8aaa;
+    --text-dim: #4a5a78;
+    --accent-blue: #4a9eff;
+    --accent-blue-dim: #1a3a5c;
+    --accent-teal: #2dd4bf;
+    --accent-teal-dim: #0f3330;
+    --accent-amber: #f59e0b;
+    --accent-amber-dim: #3a2800;
+    --accent-green: #4ade80;
+    --accent-green-dim: #0f2a1a;
+    --accent-red: #f87171;
+    --accent-red-dim: #2a0f0f;
+    --accent-purple: #a78bfa;
+    --accent-purple-dim: #1e1540;
+    --radius: 6px;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --serif: 'IBM Plex Serif', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .header-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: 1rem;
+  }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: 2.6rem;
+    line-height: 1.15;
+    color: #eef2ff;
+    margin-bottom: 1rem;
+  }
+
+  .header h1 strong {
+    font-weight: 500;
+    color: #ffffff;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: var(--radius);
+    border: 1px solid;
+    letter-spacing: 0.05em;
+  }
+
+  .tag-blue { color: var(--accent-blue); border-color: var(--accent-blue-dim); background: var(--accent-blue-dim); }
+  .tag-teal { color: var(--accent-teal); border-color: var(--accent-teal-dim); background: var(--accent-teal-dim); }
+  .tag-amber { color: var(--accent-amber); border-color: var(--accent-amber-dim); background: var(--accent-amber-dim); }
+  .tag-purple { color: var(--accent-purple); border-color: var(--accent-purple-dim); background: var(--accent-purple-dim); }
+
+  .toc {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 2rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem 2rem;
+  }
+
+  .toc li { counter-increment: toc; }
+
+  .toc li a {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    transition: color 0.15s;
+  }
+
+  .toc li a:hover { color: var(--accent-blue); }
+
+  .toc li a::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .section { margin-bottom: 4rem; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .section-header h2 {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 1.2rem;
+    color: #eef2ff;
+    letter-spacing: -0.01em;
+  }
+
+  .section-accent {
+    display: inline-block;
+    width: 4px;
+    height: 1.2em;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .accent-blue { background: var(--accent-blue); }
+  .accent-teal { background: var(--accent-teal); }
+  .accent-amber { background: var(--accent-amber); }
+  .accent-green { background: var(--accent-green); }
+  .accent-purple { background: var(--accent-purple); }
+  .accent-red { background: var(--accent-red); }
+
+  .model-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-purple);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .model-box-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-purple);
+    margin-bottom: 0.6rem;
+  }
+
+  .model-box p {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-style: italic;
+    font-family: var(--serif);
+    line-height: 1.65;
+  }
+
+  .callout {
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    display: flex;
+    gap: 0.75rem;
+    font-size: 14px;
+  }
+
+  .callout-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .callout-note { background: var(--accent-blue-dim); border: 1px solid #1e4a7a; color: #8ec8ff; }
+  .callout-warn { background: var(--accent-amber-dim); border: 1px solid #5a3e00; color: #fcd34d; }
+  .callout-tip { background: var(--accent-teal-dim); border: 1px solid #0f4040; color: #5eead4; }
+  .callout-danger { background: var(--accent-red-dim); border: 1px solid #4a1515; color: #fca5a5; }
+
+  .code-block {
+    background: #090d14;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 1.25rem 0;
+    font-size: 13px;
+  }
+
+  .code-block-header {
+    background: var(--bg-3);
+    border-bottom: 1px solid var(--border);
+    padding: 0.45rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .code-block-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  .code-block pre {
+    font-family: var(--mono);
+    color: var(--text);
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    line-height: 1.7;
+    white-space: pre;
+  }
+
+  .kw { color: #7dd3fc; }
+  .str { color: #86efac; }
+  .cmt { color: #4a5a78; font-style: italic; }
+  .attr { color: var(--accent-teal); }
+  .val { color: #fca5a5; }
+  .punc { color: var(--text-dim); }
+  .fn { color: var(--accent-amber); }
+  .path { color: var(--accent-purple); }
+  .var { color: #c4b5fd; }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 2.5rem;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 20px;
+    bottom: 20px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .step {
+    position: relative;
+    padding-bottom: 2rem;
+  }
+
+  .step:last-child { padding-bottom: 0; }
+
+  .step-dot {
+    position: absolute;
+    left: -2.5rem;
+    top: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border-bright);
+    background: var(--bg-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    z-index: 1;
+  }
+
+  .step-dot.active {
+    border-color: var(--accent-blue);
+    background: var(--accent-blue-dim);
+    color: var(--accent-blue);
+  }
+
+  .step h4 {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 14px;
+    color: #eef2ff;
+    margin-bottom: 0.4rem;
+  }
+
+  .step p, .step ul {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .step ul {
+    margin-top: 0.5rem;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .arch {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .arch-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .arch-node {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    text-align: center;
+  }
+
+  .arch-node-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+
+  .arch-node-val {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .arch-arrow {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 0.1rem 0;
+  }
+
+  .kv-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.6rem 2rem;
+    font-size: 14px;
+    padding: 1rem 0;
+  }
+
+  .kv-key {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    padding-top: 1px;
+  }
+
+  .kv-val { color: var(--text-muted); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent-teal);
+  }
+
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 14px;
+    color: var(--text-muted);
+    padding: 0.5rem 0;
+  }
+
+  .checklist li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+
+  .checklist li::before {
+    content: '□';
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--border-bright);
+    flex-shrink: 0;
+  }
+
+  p + p { margin-top: 0.75rem; }
+
+  p { color: var(--text-muted); font-size: 14.5px; }
+
+  h3 {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 2rem 0 0.75rem;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+
+  .card-sm {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+  }
+
+  .card-sm-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-sm p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Decision tree */
+  .tree {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.75rem;
+    margin: 1.5rem 0;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.85;
+    color: var(--text-muted);
+    overflow-x: auto;
+  }
+
+  .tree .branch { color: var(--text-dim); }
+  .tree .label { color: var(--accent-blue); }
+  .tree .verdict-good { color: var(--accent-green); }
+  .tree .verdict-mid { color: var(--accent-amber); }
+  .tree .verdict-bad { color: var(--accent-red); }
+
+  /* Layer stack */
+  .layers {
+    display: grid;
+    grid-template-columns: max-content 1fr 1fr;
+    gap: 0;
+    margin: 1.5rem 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .layers > div {
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+
+  .layers > div:nth-last-child(-n+3) { border-bottom: none; }
+
+  .layers .layer-head {
+    background: var(--bg-3);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+
+  .layers .layer-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent-teal);
+    background: var(--bg-2);
+  }
+
+  .layers .layer-id { color: var(--text); font-family: var(--mono); font-size: 12px; }
+  .layers .layer-mut { color: var(--text-muted); }
+
+  @media (max-width: 600px) {
+    .toc ol, .two-col { grid-template-columns: 1fr; }
+    .header h1 { font-size: 1.8rem; }
+    .page { padding: 2rem 1.25rem 4rem; }
+    .layers { grid-template-columns: 1fr; }
+    .layers > div { border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="header">
+    <div class="header-eyebrow">field guide · phase 0 · pre-install</div>
+    <h1>Network Discovery<br><strong>&amp; OS Diagnosis of an Unknown Host</strong></h1>
+    <p style="color: var(--text-muted); max-width: 620px; margin-top: 0.75rem; font-size: 15px;">
+      Before you can <code>nixos-anywhere</code> a machine, you must locate it on the LAN, figure out what (if anything) is running on it, and decide how it will hold a stable address. This guide walks the diagnostic phase that precedes the install — a learning track as much as a runbook.
+    </p>
+    <div class="header-meta">
+      <span class="tag tag-blue">nmap</span>
+      <span class="tag tag-teal">arp / dhcp</span>
+      <span class="tag tag-amber">os fingerprinting</span>
+      <span class="tag tag-purple">addressing</span>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Table of contents">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#prereqs">Prerequisite vocabulary</a></li>
+      <li><a href="#mental-models">Mental models</a></li>
+      <li><a href="#phase-a">Phase A · Network reconnaissance</a></li>
+      <li><a href="#phase-b">Phase B · OS fingerprinting</a></li>
+      <li><a href="#decision">Decision point · branch by state</a></li>
+      <li><a href="#phase-c">Phase C · Pin a stable address</a></li>
+      <li><a href="#phase-d">Phase D · Bridge to install-ready</a></li>
+    </ol>
+  </nav>
+
+
+  <!-- ────────────────────────────────────────────
+       SECTION 1 — PREREQUISITES
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="prereqs">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-accent accent-blue"></span>
+      <h2>Prerequisite vocabulary</h2>
+    </div>
+
+    <p>The diagnostic phase trades almost entirely in three layers of identity. If you internalise the distinction between them, every tool in this guide stops feeling arbitrary and starts feeling like a way of poking one specific layer.</p>
+
+    <div class="layers">
+      <div class="layer-head">Layer</div>
+      <div class="layer-head">Identifier</div>
+      <div class="layer-head">Lifetime &amp; mutability</div>
+
+      <div class="layer-name">link (L2)</div>
+      <div class="layer-id">MAC address — <code>a4:bb:6d:..</code></div>
+      <div class="layer-mut">Burned into the NIC. Effectively permanent. The only stable identity until you have one.</div>
+
+      <div class="layer-name">network (L3)</div>
+      <div class="layer-id">IP address — <code>192.168.1.50</code></div>
+      <div class="layer-mut">A lease, not a property. Can change at any DHCP renewal unless pinned.</div>
+
+      <div class="layer-name">application</div>
+      <div class="layer-id">hostname — <code>gitara.local</code></div>
+      <div class="layer-mut">A label resolved by DNS / mDNS. Convenient, but useless until DNS knows about it.</div>
+    </div>
+
+    <p>Pre-install, the IP and hostname don't exist yet in any reliable sense. The MAC address is the one identifier that survives a reboot, an OS swap, and a router restart — so it becomes the anchor point for everything you do.</p>
+
+    <h3>Core terms</h3>
+    <div class="kv-grid">
+      <span class="kv-key">ARP</span><span class="kv-val">Address Resolution Protocol — the LAN's way of asking <em>"who has IP 192.168.1.50?"</em> and getting back a MAC. Your kernel maintains an ARP cache; <code>ip neigh</code> dumps it.</span>
+      <span class="kv-key">DHCP</span><span class="kv-val">Dynamic Host Configuration Protocol — the negotiation where a fresh host asks the LAN <em>"give me an IP"</em> and a server (your router) replies with a lease.</span>
+      <span class="kv-key">DHCP lease</span><span class="kv-val">A time-bound assignment: IP X belongs to MAC Y until time Z. Renewed periodically. Can be revoked or changed.</span>
+      <span class="kv-key">DHCP reservation</span><span class="kv-val">A router-side rule: <em>"whenever MAC Y appears, always give it IP X."</em> Same protocol, but the answer is pinned. Often called "static DHCP".</span>
+      <span class="kv-key">static IP</span><span class="kv-val">An address configured on the host itself, bypassing DHCP entirely. Brittle if the LAN's subnet changes; the router has no idea.</span>
+      <span class="kv-key">subnet / CIDR</span><span class="kv-val">The range of addresses on your LAN, written like <code>192.168.1.0/24</code>. The <code>/24</code> means "first 24 bits are the network, last 8 are host" — i.e. 256 possible addresses.</span>
+      <span class="kv-key">mDNS / .local</span><span class="kv-val">Multicast DNS — a way for hosts to broadcast their own name (<code>foo.local</code>) without a DNS server. Linux via avahi, macOS native, Windows partial.</span>
+      <span class="kv-key">TTL</span><span class="kv-val">Time-to-live on an IP packet. Different OS families ship different defaults — a useful fingerprinting signal.</span>
+    </div>
+
+    <h3>What you need on your local machine</h3>
+    <div class="kv-grid">
+      <span class="kv-key">nmap</span><span class="kv-val">Swiss-army-knife scanner. Does ARP sweeps, port scans, OS fingerprinting, banner grabs.</span>
+      <span class="kv-key">arp-scan</span><span class="kv-val">Faster and louder than nmap for pure L2 discovery. Bypasses ICMP entirely.</span>
+      <span class="kv-key">ip / iproute2</span><span class="kv-val">Inspect your own interfaces, routing table, and ARP cache. <code>ip a</code>, <code>ip r</code>, <code>ip neigh</code>.</span>
+      <span class="kv-key">ssh</span><span class="kv-val">For the moment you've found the host and want to confirm it speaks SSH.</span>
+      <span class="kv-key">router admin UI</span><span class="kv-val">Browser access to your gateway (often <code>192.168.1.1</code>). The DHCP client list is the single most useful page you'll touch.</span>
+    </div>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       SECTION 2 — MENTAL MODELS
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="mental-models">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-accent accent-purple"></span>
+      <h2>Mental models</h2>
+    </div>
+
+    <p>Four frames that make the rest of this guide click. They're worth re-reading once after you've finished — the diagnostic flow makes more sense from the other side.</p>
+
+    <div class="two-col">
+      <div class="card-sm">
+        <div class="card-sm-title">The MAC is the anchor</div>
+        <p>An unknown box on your LAN has no stable IP, no DNS name, no SSH key you know. The MAC of its NIC is the one identifier you can latch onto and follow across reboots, reinstalls, and IP changes. Every "find it again later" mechanism — DHCP reservation, ARP lookup, router tables — is keyed on MAC.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Discovery is a layered question</div>
+        <p>"Is the machine alive?" is L2 (ARP). "Does it route?" is L3 (ping). "Does it speak SSH?" is L4 + application. Each layer can succeed while the one above it fails — a host can ARP-respond while ignoring pings, or accept TCP while rejecting your key. Diagnose top-down or bottom-up, but know which layer you're testing.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">OS fingerprinting is inference</div>
+        <p>You never directly observe what OS is running. You observe behaviour — open ports, packet TTLs, TCP/IP stack quirks, service banners — and infer. Each signal is a probability shift, not proof. Two strong independent signals (e.g. TTL 128 + port 3389 open) are more trustworthy than one strong signal.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Addressing is a negotiation</div>
+        <p>"Static IP" feels like a property of the machine, but the LAN doesn't care what the machine claims if the router hands the same address to someone else. A DHCP reservation on the router is almost always the right answer for a server — the address is enforced by the authority that issues addresses, not by the recipient.</p>
+      </div>
+    </div>
+
+    <div class="model-box">
+      <div class="model-box-title">The diagnostic arc</div>
+      <p>Start from nothing → enumerate every MAC on the LAN → narrow to the candidate by elimination or by hardware MAC OUI → confirm it's the right box → fingerprint the OS to know what bridge you need to cross → pin the address by MAC so it stays found → cross the bridge to a state where <code>nixos-anywhere</code> can take over. Each phase reduces uncertainty before the next one begins.</p>
+    </div>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       PHASE A — NETWORK RECONNAISSANCE
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="phase-a">
+    <div class="section-header">
+      <span class="section-num">A</span>
+      <span class="section-accent accent-amber"></span>
+      <h2>Phase A · Network reconnaissance</h2>
+    </div>
+
+    <p>The goal of this phase is a list of every host on your subnet with their MAC and IP, from which you'll identify the target by elimination. You aren't trying to talk to the target yet — you're trying to <em>locate</em> it.</p>
+
+    <h3>A1 · Know your own subnet</h3>
+    <p>Before you can sweep the LAN, you must know which addresses count as "the LAN".</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local · identify your subnet</span></div>
+      <pre><span class="fn">ip</span> -4 addr show
+<span class="cmt"># Look for your active interface (often wlan0 / enp*s* / eth0).
+# You'll see something like:
+#   inet 192.168.1.42/24 brd 192.168.1.255 scope global ...</span>
+
+<span class="fn">ip</span> route show default
+<span class="cmt"># Confirms your gateway address — usually the router itself.
+# default via 192.168.1.1 dev wlan0</span></pre>
+    </div>
+
+    <p>From that you know two things: the subnet to sweep (<code>192.168.1.0/24</code> in the example) and the router (<code>192.168.1.1</code>), which is your second source of truth in the next step.</p>
+
+    <h3>A2 · The DHCP client list (the easy answer)</h3>
+    <p>If the target machine got a DHCP lease — which it will if it boots into any modern OS with default networking — your router already knows about it. Most consumer routers expose this under <em>"Connected devices"</em>, <em>"DHCP client list"</em>, or similar.</p>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">→</span>
+      <span>This is almost always the fastest path. Plug the new machine in, power it on, wait ~60 seconds, refresh the router's client list, look for the new entry. The MAC and hostname (if the OS volunteered one) appear there.</span>
+    </div>
+
+    <h3>A3 · ARP sweep (the authoritative answer)</h3>
+    <p>If the router UI is unhelpful, or the host hasn't completed DHCP, an ARP scan asks the LAN directly. ARP works below ICMP — even hosts that drop pings will respond to ARP, because the local link layer requires it.</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local · ARP-level discovery</span></div>
+      <pre><span class="cmt"># Fastest, most reliable for L2-reachable hosts. Requires root.</span>
+<span class="fn">sudo</span> arp-scan --localnet
+<span class="cmt"># Or, if not installed:</span>
+<span class="fn">sudo</span> nmap -sn -PR <span class="val">192.168.1.0/24</span>
+<span class="cmt"># -sn  = no port scan, just host discovery
+# -PR  = ARP discovery (default on a local subnet anyway)</span></pre>
+    </div>
+
+    <p>Output is a list of IP/MAC pairs and, often, a vendor name decoded from the MAC's OUI (the first 24 bits identify the NIC manufacturer). A line like <code>192.168.1.73  a4:bb:6d:11:22:33  Intel Corporate</code> is enough to recognise a new desktop with an Intel NIC sitting next to a sea of Apple and Samsung phones.</p>
+
+    <h3>A4 · Identify the target by elimination</h3>
+    <p>Two strategies, depending on what you know:</p>
+
+    <ul class="checklist">
+      <li><strong>You know the target's MAC</strong> (BIOS shows it, sticker on the NIC, manufacturer plate). Grep the scan output for those octets. Done.</li>
+      <li><strong>You don't know the MAC</strong>. Run the scan once <em>before</em> plugging in the new machine, save the output. Power on the new machine, wait, run the scan again. The new line is the target.</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local · before / after diff</span></div>
+      <pre><span class="fn">sudo</span> arp-scan --localnet &gt; <span class="path">/tmp/lan-before.txt</span>
+<span class="cmt"># ... plug in and boot the target ...</span>
+<span class="fn">sudo</span> arp-scan --localnet &gt; <span class="path">/tmp/lan-after.txt</span>
+<span class="fn">diff</span> /tmp/lan-before.txt /tmp/lan-after.txt</pre>
+    </div>
+
+    <div class="callout callout-note">
+      <span class="callout-icon">i</span>
+      <span>If the target shows up with no IP, only a MAC in the router's tables — it powered on, sent a DHCP request, but didn't complete. Likely a firewall, a misconfigured NIC, or a non-networked installer waiting for input. Check the cable and the link light first.</span>
+    </div>
+
+    <h3>A5 · Sanity-check the candidate IP</h3>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local · liveness ping</span></div>
+      <pre><span class="fn">ping</span> -c 4 <span class="val">192.168.1.73</span>
+<span class="cmt"># Some hosts (Windows by default) drop ICMP. If ping fails but the
+# host showed up in ARP, the host is alive — just silent at L3.</span>
+
+<span class="fn">ip</span> neigh show
+<span class="cmt"># Shows your local ARP cache. The candidate should appear with
+# state REACHABLE or STALE — both mean the kernel has confirmed it.</span></pre>
+    </div>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       PHASE B — OS FINGERPRINTING
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="phase-b">
+    <div class="section-header">
+      <span class="section-num">B</span>
+      <span class="section-accent accent-teal"></span>
+      <h2>Phase B · OS fingerprinting</h2>
+    </div>
+
+    <p>You now have an IP. The next question is what's behind it. Three signals, used together, will tell you with high confidence whether you're looking at Linux, Windows, a vendor installer, or nothing at all.</p>
+
+    <h3>Signal 1 · The port surface</h3>
+    <p>Different OS families ship different default services. The port profile is often the loudest signal.</p>
+
+    <div class="kv-grid">
+      <span class="kv-key">22</span><span class="kv-val">SSH. Strong signal for Linux / BSD / macOS. (Windows can run OpenSSH but rarely does by default.)</span>
+      <span class="kv-key">135 / 139 / 445</span><span class="kv-val">SMB / NetBIOS. Strong signal for Windows. Samba on Linux also opens these, but the combination of all three is Windows-shaped.</span>
+      <span class="kv-key">3389</span><span class="kv-val">RDP. Effectively Windows-only by default.</span>
+      <span class="kv-key">5357</span><span class="kv-val">WSDAPI — Windows network discovery. Windows-only.</span>
+      <span class="kv-key">631</span><span class="kv-val">CUPS printing. Common on Linux / macOS.</span>
+      <span class="kv-key">5353</span><span class="kv-val">mDNS / Bonjour / avahi. Common on macOS and Linux desktops; less common on Windows.</span>
+      <span class="kv-key">nothing open</span><span class="kv-val">Either a strict firewall, a freshly-booted installer with no services, or no OS at all (PXE/BIOS waiting).</span>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local · scan the candidate</span></div>
+      <pre><span class="fn">nmap</span> -Pn -sS -p- <span class="val">192.168.1.73</span>
+<span class="cmt"># -Pn  = assume host is up; skip ICMP discovery (works behind firewalls)
+# -sS  = TCP SYN scan (fast, requires root)
+# -p-  = all 65535 ports. Slower; use a top-1000 scan first if needed:</span>
+
+<span class="fn">nmap</span> -Pn <span class="val">192.168.1.73</span>
+<span class="cmt"># Top 1000 ports is usually enough to fingerprint the OS family.</span></pre>
+    </div>
+
+    <h3>Signal 2 · TTL — the cheapest possible signal</h3>
+    <p>The TTL field in an IP packet is decremented at each router hop. On a local LAN you see roughly the OS's <em>initial</em> TTL. The defaults vary by OS family:</p>
+
+    <div class="kv-grid">
+      <span class="kv-key">TTL ~64</span><span class="kv-val">Linux, BSD, macOS, Android. Most modern Unix-derived stacks.</span>
+      <span class="kv-key">TTL ~128</span><span class="kv-val">Windows.</span>
+      <span class="kv-key">TTL ~255</span><span class="kv-val">Cisco / routers / some embedded.</span>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local · read TTL off a ping</span></div>
+      <pre><span class="fn">ping</span> -c 1 <span class="val">192.168.1.73</span>
+<span class="cmt"># 64 bytes from 192.168.1.73: icmp_seq=1 ttl=64 time=0.4 ms
+#                                              ^^^^^^
+# Initial TTL was 64 → almost certainly Linux/BSD/macOS.
+# If you see ttl=128 → Windows. ttl=127 → Windows one hop away. Etc.</span></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">▲</span>
+      <span>TTL is a hint, not proof. It's trivially forgeable, can be altered by sysctl, and a router between you and the host shifts it. Treat it as a vote, not a verdict.</span>
+    </div>
+
+    <h3>Signal 3 · Active fingerprinting (nmap -O)</h3>
+    <p>nmap's <code>-O</code> probes TCP/IP stack idiosyncrasies that differ subtly across OS families — initial sequence number patterns, window sizes, TCP options ordering — and matches them against a fingerprint database.</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local · active OS detection</span></div>
+      <pre><span class="fn">sudo</span> nmap -O <span class="val">192.168.1.73</span>
+<span class="cmt"># Requires at least one open and one closed port to be reliable.
+# Outputs a guess like:
+#   Running: Linux 5.X
+#   OS CPE: cpe:/o:linux:linux_kernel:5
+#   OS details: Linux 5.4 - 5.15</span>
+
+<span class="cmt"># Add service / banner grabbing for more confidence:</span>
+<span class="fn">sudo</span> nmap -A <span class="val">192.168.1.73</span>
+<span class="cmt"># -A folds in -O, -sV (service versions), default scripts, traceroute.
+# SSH banners often leak the distro (Ubuntu 22.04, Debian 12, etc.).</span></pre>
+    </div>
+
+    <h3>Putting the signals together</h3>
+    <div class="two-col">
+      <div class="card-sm">
+        <div class="card-sm-title">Profile · Linux</div>
+        <p>Port 22 open + TTL 64 + SSH banner mentions OpenSSH / Ubuntu / Debian. Reachable. <strong>You're ready for nixos-anywhere.</strong></p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Profile · Windows</div>
+        <p>Ports 135/139/445 open, often 3389 + 5357. TTL 128. SMB banner identifies Windows version. <strong>Needs a Linux bridge first.</strong></p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Profile · No OS / PXE</div>
+        <p>Host appears in ARP, but no ports open and no ICMP. Often a UEFI shell, a BIOS PXE-boot wait, or a halted installer. <strong>Needs hands-on or PXE boot.</strong></p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Profile · Linux installer / live USB</div>
+        <p>Port 22 open <em>if</em> the live OS started sshd, often with a default password. Limited disk. Useful as a transient bridge to install NixOS. Confirm before assuming.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       DECISION POINT
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="decision">
+    <div class="section-header">
+      <span class="section-num">→</span>
+      <span class="section-accent accent-green"></span>
+      <h2>Decision point · branch by state</h2>
+    </div>
+
+    <p>The diagnosis collapses into one of four states. Each branches to a different path through the rest of this guide.</p>
+
+    <div class="tree">
+<span class="branch">┌─</span> <span class="label">Linux + SSH reachable</span>            <span class="verdict-good">→ Phase C → install guide. Easiest path.</span>
+<span class="branch">├─</span> <span class="label">Linux but SSH not exposed</span>         <span class="verdict-mid">→ Enable sshd locally (one-time hands-on), then Phase C.</span>
+<span class="branch">├─</span> <span class="label">Windows of any flavour</span>            <span class="verdict-mid">→ Phase D (Linux bridge) → Phase C → install.</span>
+<span class="branch">└─</span> <span class="label">No OS / unresponsive</span>              <span class="verdict-bad">→ Phase D (boot live env, PXE, or USB), then Phase C.</span>
+    </div>
+
+    <div class="model-box">
+      <div class="model-box-title">Why this branching matters</div>
+      <p>The install tool only knows one trick: it SSHes in, kexecs over a running Linux. Every branch that isn't already "Linux + SSH" is just a different way to get there. Once you reach the green state, the existing install guide takes over and the box is on track to be NixOS.</p>
+    </div>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       PHASE C — PIN A STABLE ADDRESS
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="phase-c">
+    <div class="section-header">
+      <span class="section-num">C</span>
+      <span class="section-accent accent-purple"></span>
+      <h2>Phase C · Pin a stable address</h2>
+    </div>
+
+    <p>Whatever IP the box currently holds is a lease — it can change on the next renewal. Before you invest in this address (SSH config, future <code>nixos-rebuild --target-host</code>, DNS entries), pin it. There are three places this can happen, and they're not equivalent.</p>
+
+    <div class="arch">
+      <div class="arch-row">
+        <div class="arch-node" style="border-color: var(--accent-teal-dim);">
+          <div class="arch-node-label" style="color: var(--accent-teal);">option 1 · best</div>
+          <div class="arch-node-val">DHCP reservation on the router</div>
+        </div>
+        <div class="arch-node" style="border-color: var(--accent-amber-dim);">
+          <div class="arch-node-label" style="color: var(--accent-amber);">option 2 · ok</div>
+          <div class="arch-node-val">Static IP on the host</div>
+        </div>
+        <div class="arch-node" style="border-color: var(--accent-blue-dim);">
+          <div class="arch-node-label" style="color: var(--accent-blue);">option 3 · soft</div>
+          <div class="arch-node-val">mDNS hostname (.local)</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Option 1 · DHCP reservation on the router (recommended)</h3>
+    <p>The router binds a specific MAC to a specific IP. The host continues to do DHCP — it just always gets the same answer. The authority that owns address allocation is the one enforcing the pin, which is what makes this the cleanest model.</p>
+
+    <ul class="checklist">
+      <li>Log into the router's admin UI (usually <code>http://&lt;gateway-ip&gt;</code>).</li>
+      <li>Find <em>LAN</em> → <em>DHCP server</em> → <em>Address reservation</em> (names vary by vendor).</li>
+      <li>Add a rule: MAC <code>aa:bb:cc:dd:ee:ff</code> → IP <code>192.168.1.50</code>.</li>
+      <li>Choose an IP <em>outside</em> the router's dynamic pool if the UI offers that distinction, to avoid future collisions.</li>
+      <li>Reboot the target (or run <code>dhclient -r &amp;&amp; dhclient</code>) so it picks up the new lease.</li>
+    </ul>
+
+    <h3>Option 2 · Static IP configured on the host</h3>
+    <p>The host claims an address without asking. Works, but the router has no idea — if a different DHCP client gets handed the same address, you'll have a conflict the static host will lose on the next ARP storm.</p>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">▲</span>
+      <span>If you go this route, the chosen IP must be <em>outside</em> the router's DHCP pool. Most home routers default to a pool like <code>192.168.1.100–199</code>; picking <code>192.168.1.50</code> (below the pool) is safe.</span>
+    </div>
+
+    <h3>Option 3 · mDNS hostname (complement, not replacement)</h3>
+    <p>If the host runs avahi (most Linux distros) or Bonjour (macOS), it advertises itself as <code>&lt;hostname&gt;.local</code> on the LAN. You can SSH to <code>gitara.local</code> without knowing or caring what IP it currently holds.</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">local · try mDNS</span></div>
+      <pre><span class="fn">avahi-resolve</span> -n4 gitara.local
+<span class="cmt"># Or just:</span>
+<span class="fn">ping</span> gitara.local</pre>
+    </div>
+
+    <p>Treat this as a convenience layer on top of one of the pinning options, not a substitute for them. It depends on avahi being running and on every client supporting mDNS.</p>
+  </section>
+
+
+  <!-- ────────────────────────────────────────────
+       PHASE D — BRIDGE TO INSTALL-READY
+  ─────────────────────────────────────────────── -->
+  <section class="section" id="phase-d">
+    <div class="section-header">
+      <span class="section-num">D</span>
+      <span class="section-accent accent-red"></span>
+      <h2>Phase D · Bridge to install-ready</h2>
+    </div>
+
+    <p>This phase only applies to the non-green branches: Windows installations, no OS, or Linux with SSH disabled. The endpoint is the same in every case — a running Linux with sshd listening on port 22 and your public key authorised.</p>
+
+    <h3>Branch · Windows on disk</h3>
+    <p>You cannot kexec from Windows. The cleanest path is to boot a Linux live environment instead, which uses RAM and ignores the Windows install on disk entirely. Once nixos-anywhere runs, that Windows install gets wiped along with everything else.</p>
+
+    <ul class="checklist">
+      <li><strong>Path 1 — Linux live USB (least friction)</strong>: write a NixOS minimal ISO or Ubuntu live to a USB stick, plug it in, boot from it once. Enable sshd, set a password or drop your key, then run the install from your local machine.</li>
+      <li><strong>Path 2 — PXE / netboot.xyz</strong>: if the BIOS supports network boot, you can chainload a live environment over the LAN with no USB. Setup is heavier — you need a TFTP/HTTP server on the LAN — but no physical media touches the target.</li>
+      <li><strong>Path 3 — IPMI / BMC</strong>: if the box has out-of-band management (server hardware does, most desktops don't), you can mount an ISO over the network and boot it remotely.</li>
+    </ul>
+
+    <div class="callout callout-note">
+      <span class="callout-icon">i</span>
+      <span>"Headless remote install" stops being literally true the moment you discover the target is Windows. At minimum you need a USB stick and one boot-time keypress. After that one moment, the rest of the install is fully remote.</span>
+    </div>
+
+    <h3>Branch · No OS / fresh hardware</h3>
+    <p>Same paths as the Windows case — the disk is empty so there's nothing to preserve, but you still need to put <em>something</em> bootable in front of the BIOS. A NixOS minimal ISO on USB is the most direct option, and it includes sshd ready to enable.</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">on the live-booted target · enable ssh</span></div>
+      <pre><span class="cmt"># NixOS minimal ISO already has openssh available. Start it:</span>
+<span class="fn">sudo</span> systemctl start sshd
+
+<span class="cmt"># Set a password for root (no password by default on the ISO):</span>
+<span class="fn">sudo</span> passwd root
+
+<span class="cmt"># Confirm the IP — needed for the install command:</span>
+<span class="fn">ip</span> -4 addr show
+
+<span class="cmt"># Optional: drop your public key in directly to skip the password prompt</span>
+<span class="fn">mkdir</span> -p /root/.ssh
+<span class="fn">curl</span> https://github.com/&lt;you&gt;.keys &gt; /root/.ssh/authorized_keys</pre>
+    </div>
+
+    <h3>Branch · Linux with SSH disabled</h3>
+    <p>The host runs Linux but isn't exposing port 22. If you have physical or KVM access, the fix is a one-liner on the host:</p>
+
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-block-label">on the target · enable + open ssh</span></div>
+      <pre><span class="fn">sudo</span> systemctl enable --now sshd
+<span class="fn">sudo</span> ufw allow 22       <span class="cmt"># Ubuntu / Debian if ufw is in use</span>
+<span class="fn">sudo</span> firewall-cmd --add-service=ssh --permanent  <span class="cmt"># Fedora / RHEL</span></pre>
+    </div>
+
+    <h3>The handoff</h3>
+    <p>You're done with this guide when all of the following are true. The install guide picks up from here.</p>
+
+    <ul class="checklist">
+      <li>You know the target's MAC address.</li>
+      <li>The target has an IP that won't change (DHCP reservation or static).</li>
+      <li><code>ssh root@&lt;ip&gt;</code> or <code>ssh &lt;user&gt;@&lt;ip&gt;</code> with passwordless sudo lands you in a shell.</li>
+      <li>The shell is running Linux (any distro, including a live ISO).</li>
+      <li>The target is on ethernet, not WiFi.</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">→</span>
+      <span>Once those boxes are checked, the existing <em>USB-free, Fully Remote via nixos-anywhere</em> guide takes over. The diagnostic uncertainty is gone — from here on, every step is deterministic.</span>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

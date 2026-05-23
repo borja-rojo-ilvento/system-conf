@@ -26,6 +26,14 @@
     fzf
     claude-code
     vale
+
+    # For some of the snacks plugin needs
+    imagemagick
+    # gs?
+    mermaid-cli
+    lazygit
+    ghostscript
+    sqlite
   ];
 
   home.sessionVariables.EDITOR = "nvim";

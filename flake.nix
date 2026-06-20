@@ -46,7 +46,7 @@
             }
           ];
         };
-        everest = nixpkgs.lib.nixosSystem {
+        ever = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = {
             inherit (inputs) nixos-hardware home-manager;

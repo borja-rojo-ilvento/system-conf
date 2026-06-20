@@ -42,7 +42,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.users.brojo = import ./lib/users/brojo/home.nix;
+              home-manager.users.brojo = import ./lib/users/brojo;
             }
           ];
         };
@@ -66,7 +66,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.users.brojo = import ./lib/users/brojo/home.nix;
+              home-manager.users.brojo = import ./lib/users/brojo;
             }
           ];
         };
@@ -97,7 +97,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.users.brojo = import ./lib/users/brojo/home.nix;
+              home-manager.users.brojo = import ./lib/users/brojo;
             }
           ];
         };

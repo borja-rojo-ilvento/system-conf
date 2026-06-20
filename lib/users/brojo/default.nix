@@ -9,6 +9,9 @@
 
   home.packages = with pkgs; [
     # stremio # Takes WAY too long to build.
+    # git and ghostty are not listed here: programs.git and programs.ghostty
+    # (in ./programs) install their own binaries into the profile. Dev CLI tools
+    # (pkg-config, wget, jq, fd, sqlite, …) live in ./programs/development.nix.
     nix-search-cli
     firefox
     clang
@@ -19,8 +22,6 @@
     # binaries in Home Manager's buildEnv.
     go
     nodejs
-    wget
-    git
     code-cursor
     zoom-us
     xwayland
@@ -29,8 +30,6 @@
     flameshot
     fzf
     ledger-live-desktop
-    ledger-udev-rules
-    ghostty
     kdePackages.kscreen
     home-manager
     nmap
@@ -40,7 +39,6 @@
     jdk
     devbox
     stow
-    pkg-config
     openssl
     nix-direnv
     oh-my-zsh
@@ -60,7 +58,6 @@
     freerdp
     remmina
     mesa-demos
-    jq
     vscode
     # Audio control
     wireplumber

@@ -31,7 +31,7 @@
     # Fcitx5 main configuration
     "fcitx5/conf/classicui.conf".text = ''
       [Behavior]
-      # Candidate box positioning (for Hyprland/Wayland)
+      # Candidate box positioning under Wayland
       FollowCursor=True
       PreeditTextInApplication=True
       ShowPreviewTextBeforePreedit=False
@@ -113,20 +113,4 @@
     alias ime-toggle='fcitx5-remote -t'
     alias ime-status='fcitx5-remote -s'
   '';
-
-  # Hyprland-specific configuration for input method
-  # Add to hyprland config via environment variables
-  home.file = {
-    ".config/hyprland/ime-config.conf".text = ''
-      # Input method configuration for Hyprland
-
-      # Use Fcitx5 for input method handling
-      # Fcitx5 will automatically handle candidate window positioning
-      # in Wayland via zwp_text_input_v3
-
-      # Keybindings for input method control
-      # These can be added to main hyprland config if needed
-      # $mod, grave, exec, fcitx5-remote -t
-    '';
-  };
 }

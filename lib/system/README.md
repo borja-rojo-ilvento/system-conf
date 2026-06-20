@@ -5,13 +5,16 @@ host regardless of which physical machine is running it.
 
 ## Layout
 
-- `base.nix` — root of the systems layer. Sets nix store policy, locale,
-  audio, display manager, desktop environment, polkit, dbus, xdg.portal,
-  PAM/kwallet integration, etc.
+- `base.nix` — root of the systems layer. Sets audio, display manager, desktop
+  environment, polkit, dbus, PAM/kwallet integration, etc. (Core nix store
+  policy, locale, shell and stateVersion live in `core.nix`; the XDG portal is
+  left to the Plasma 6 module, which registers the kde + gtk backends natively.)
 - `power-management.nix` — power-profiles-daemon, thermald, default lid/power
   button policy, polkit rules for non-interactive suspend.
-- `hyprpolkitagent.nix` — system unit for the Hyprland polkit agent.
 - `xbox-controller.nix` — xpadneo driver enablement.
+- `hyprpolkitagent.nix` — **sequestered**: not imported. Custom systemd unit for
+  the Hyprland polkit agent; Plasma provides polkit-kde-agent natively. See the
+  file's header for re-activation steps.
 - `hyprland/` — **sequestered**: not imported. See the file's header for
   re-activation steps.
 - `wifi-profiles/` — declarative WiFi connection fragments (currently unused;

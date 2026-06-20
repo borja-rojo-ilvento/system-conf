@@ -1,4 +1,16 @@
 { pkgs, ... }:
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Sequestered dunst (notification daemon) module.
+#
+# Not imported from lib/users/brojo/programs/default.nix. The active session is
+# Plasma 6, which ships its own notification service; dunst is Hyprland-era
+# tooling kept on disk for a future Hyprland revival.
+#
+# To re-enable: add `./dunst.nix` back to the imports in
+# lib/users/brojo/programs/default.nix.
+# ─────────────────────────────────────────────────────────────────────────────
+
 {
   services.dunst = {
     enable = true;

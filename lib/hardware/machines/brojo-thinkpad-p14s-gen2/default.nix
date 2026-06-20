@@ -51,9 +51,27 @@
   };
 
   # Intel video acceleration for Steam (iGPU path).
-  programs.steam.extraPackages = with pkgs; [
-    intel-media-driver
-  ];
+  programs.steam = {
+    extraPackages = with pkgs; [
+      intel-media-driver
+    ];
+
+    # Steam's store/library are Chromium (CEF) web views. On this Iris Xe +
+    # Mesa 26.1.2 combination, CEF's GPU *layer compositing* (the DMABUF /
+    # zero-copy path) produces corrupted surfaces — garbled, torn store
+    # rendering. Disabling only GPU compositing (GPU rasterization stays on)
+    # moves the final composite to CPU and sidesteps the broken path.
+    #
+    # Scoped to this host on purpose: everest is NVIDIA-only and renders CEF
+    # through a different stack, so it does not hit this bug. There is no env
+    # equivalent for the switch — `-cef-disable-gpu-compositing` is a Chromium
+    # command-line flag, so it is passed via the package's `extraArgs`, reached
+    # through the native `programs.steam.package` option. Remove once Mesa fixes
+    # the iGPU compositing path upstream.
+    package = pkgs.steam.override {
+      extraArgs = "-cef-disable-gpu-compositing";
+    };
+  };
 
   services.logind.settings.Login = {
     HandleLidSwitch = "suspend-then-hibernate";

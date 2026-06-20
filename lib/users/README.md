@@ -5,10 +5,13 @@ Per-user Home Manager configurations, intended to be portable across machines.
 ## Layout
 
 - `brojo/`
-  - `home.nix` — root of the user env. Lists user packages and imports
+  - `default.nix` — root of the user env. Lists user packages and imports
     `./programs`.
-  - `programs/` — per-program configuration (zsh, git, neovim, ghostty,
-    rofi, dunst, OBS, etc.) plus the user-side power-management.
+  - `programs/` — per-program configuration (zsh, git, neovim, ghostty, OBS,
+    input-method, etc.) plus the user-side power-management.
+  - `programs/dunst.nix`, `programs/rofi/` — **sequestered**: not imported.
+    Hyprland-era notification daemon + launcher; Plasma 6 provides its own
+    notifications + KRunner. Kept on disk; see each file's header to revive.
   - `programs/hyprland/` — **sequestered**: not imported. Holds the Hyprland
     user config, swaylock, hypridle, waybar, the wallpaper fetch, and the
     Hyprland-specific power keybindings fragment. See the file's header for
@@ -26,9 +29,9 @@ the host or hardware layer instead of from here.
 
 ## Adding a user
 
-1. Add a sibling directory: `lib/users/<user>/home.nix` plus a `programs/`
+1. Add a sibling directory: `lib/users/<user>/default.nix` plus a `programs/`
    tree.
 2. Wire it into `flake.nix`'s home-manager block:
-   `home-manager.users.<user> = import ./lib/users/<user>/home.nix;`
+   `home-manager.users.<user> = import ./lib/users/<user>;`
 3. Make sure the matching system user exists (declared from
    `lib/hosts/default.nix` or a host-specific module).

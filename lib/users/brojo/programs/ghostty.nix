@@ -29,11 +29,30 @@
     };
   };
 
-  # Enable ghostty systemd service for automatic startup on login
-  # This ensures the daemon is running and ready for instant window launches
-  # Uses Home Manager activation script to ensure persistence across rebuilds
-  home.activation.enableGhosttyService = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-    ${pkgs.systemd}/bin/systemctl --user enable --now app-com.mitchellh.ghostty.service || true
-  '';
+  # Pre-warm the ghostty single-instance daemon at login so subsequent windows
+  # open instantly. Declared as a Home-Manager-managed user service rather than
+  # an imperative `systemctl --user enable` activation hook, so it is fully
+  # described by the config and torn down cleanly if removed.
+  systemd.user.services.ghostty = {
+    Unit = {
+      Description = "Ghostty terminal (pre-warmed single-instance daemon)";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = "${config.programs.ghostty.package}/bin/ghostty";
+      Restart = "on-failure";
+      RestartSec = 3;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 
+  # ── Anex: prior approaches and why they were dropped ────────────────────────
+  #
+  # Tried: home.activation.enableGhosttyService running
+  #   systemctl --user enable --now app-com.mitchellh.ghostty.service
+  # on every rebuild. Replaced with the declarative systemd.user.services unit
+  # above: the activation hook depended on the xdg-autostart-generated unit name
+  # existing, swallowed all errors with `|| true`, and left the service running
+  # even after the config was removed (no declarative teardown).
 }

@@ -26,21 +26,12 @@
   # Display-manager log capture (useful when debugging suspend → DM crashes).
   services.displayManager.logToFile = true;
 
-  # X server DPMS (only consulted when an X session is in play).
-  services.xserver.serverFlagsSection = ''
-    Option "BlankTime" "0"
-    Option "StandbyTime" "0"
-    Option "SuspendTime" "0"
-    Option "OffTime" "0"
-  '';
-
-  # System packages for power management
+  # System packages for power management. CLI tools that overlap with the user
+  # environment (upower, acpi, brightnessctl, playerctl) live in
+  # lib/users/brojo/programs/power-management.nix; only the daemon binary is
+  # kept here at the system level.
   environment.systemPackages = with pkgs; [
     power-profiles-daemon
-    upower
-    acpi
-    brightnessctl
-    playerctl
   ];
 
   # Polkit rules for power management without password prompt
@@ -78,4 +69,9 @@
   # Tried: services.cpupower-gui.enable = false (a pseudo-toggle).
   # Removed because Nix already defaults disabled options to off; explicit
   # `= false` was just noise.
+  #
+  # Tried: services.xserver.serverFlagsSection with BlankTime/StandbyTime/etc.
+  # set to 0. Removed because the active session is Plasma 6 / Wayland; the X
+  # server flags are only consulted by an Xorg session, so they were dead
+  # config. Plasma's own power/energy settings govern screen blanking now.
 }

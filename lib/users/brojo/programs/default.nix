@@ -4,10 +4,9 @@
     ./obs.nix
     ./neovim.nix
     ./discord.nix
-    ./dunst.nix
-    ./rofi
-    # ./hyprland is intentionally not imported — see ./hyprland/default.nix
-    # for the sequestered-but-preserved Hyprland user module.
+    # ./dunst.nix, ./rofi and ./hyprland are intentionally not imported — the
+    # active session is Plasma 6, which provides notifications + KRunner. See
+    # each module's sequestered header for revival steps.
     ./power-management.nix
     ./development.nix
     ./input-method.nix

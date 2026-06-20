@@ -8,19 +8,12 @@
 {
   imports = [
     ./core.nix
-    ./hyprpolkitagent.nix
     ./power-management.nix
     ./xbox-controller.nix
-    # ./hyprland is intentionally not imported — see lib/system/hyprland/default.nix
-    # for the sequestered-but-preserved Hyprland system module.
+    # ./hyprland and ./hyprpolkitagent.nix are intentionally not imported — the
+    # active session is Plasma 6 / Wayland on every host. See each file's
+    # sequestered header for revival steps.
   ];
-
-  # Hyprland binary cache — desktop hosts only; server builds don't use it.
-  nix.settings = {
-    substituters         = [ "https://hyprland.cachix.org" ];
-    trusted-substituters = [ "https://hyprland.cachix.org" ];
-    trusted-public-keys  = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
-  };
 
   hardware.steam-hardware.enable = true;
 
@@ -64,14 +57,10 @@
   security.polkit.enable = true;
 
   # XDG portal — desktop integration for file pickers, screen share, etc.
-  xdg.portal = {
-    enable = true;
-    extraPortals = [
-      pkgs.kdePackages.xdg-desktop-portal-kde
-      pkgs.xdg-desktop-portal-hyprland
-    ];
-    config.common.default = "hyprland";
-  };
+  # Not configured here: services.desktopManager.plasma6.enable already enables
+  # xdg.portal and registers xdg-desktop-portal-kde (+ the gtk fallback), which
+  # is the correct backend for this KWin session. See Anex for the prior custom
+  # block.
 
   # ── Anex: prior approaches and why they were dropped ────────────────────────
   #
@@ -95,6 +84,21 @@
   # The active session is Plasma 6/Wayland on every current host. The Hyprland
   # module is preserved on disk but no longer imported from the active path —
   # see lib/system/hyprland/default.nix for the explanation.
+  #
+  # Tried: an explicit xdg.portal block here —
+  #   extraPortals = [ xdg-desktop-portal-kde xdg-desktop-portal-hyprland ];
+  #   config.common.default = "hyprland";
+  # Removed because (a) plasma6 already enables xdg.portal and adds the kde +
+  # gtk portals natively, so the kde entry was a duplicate, and (b) defaulting
+  # to "hyprland" routed pickers/screenshare through the wlroots backend on a
+  # KWin session, where it is the wrong (and partly non-functional) backend.
+  #
+  # Tried: importing ./hyprpolkitagent.nix (a custom systemd user unit running
+  # hyprpolkitagent). Removed from the active path because Plasma provides
+  # polkit-kde-agent natively; the file is sequestered, not deleted.
+  #
+  # Tried: the hyprland.cachix.org binary cache in nix.settings. Removed because
+  # nothing on the active path builds Hyprland, so the substituter never hit.
   #
   # Tried: nix settings, boot loader, locale, zsh, allowUnfree, stateVersion
   # directly in this file. Extracted to lib/system/core.nix so server hosts

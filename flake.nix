@@ -8,6 +8,9 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    akirak-flake-templates = {
+      url = "github:akirak/flake-templates";
+    };
   };
 
   outputs =
@@ -164,5 +167,8 @@
             };
           };
       };
+
+      templates = import ./templates // inputs.akirak-flake-templates.templates;
+
     };
 }

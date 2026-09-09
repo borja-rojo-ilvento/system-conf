@@ -11,6 +11,12 @@
     akirak-flake-templates = {
       url = "github:akirak/flake-templates";
     };
+    # Declarative disk partitioning. Required by nixos-anywhere, which calls
+    # config.system.build.diskoScript to format the target during install.
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -98,6 +104,61 @@
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.users.brojo = import ./lib/users/brojo;
+            }
+          ];
+        };
+
+        # Second Dell Mini. Same host shape as fuji, different payload: this
+        # one exists to run the Valheim dedicated server and nothing else.
+        snow = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            # disko is passed through so the hardware module can import
+            # disko.nixosModules.disko alongside its own disk-config.nix.
+            inherit (inputs) nixos-hardware home-manager disko;
+          };
+          modules = [
+            # Hardware configuration — second physical Dell Mini, so a new
+            # machine dir rather than a reuse of dell-mini-001. Disk layout is
+            # declared by disko in disk-config.nix; hardware-configuration.nix
+            # is an empty stub that nixos-anywhere fills in at install time.
+            ./lib/hardware/machines/dell-mini-002
+
+            # Host type configuration — headless server flavour. This is what
+            # gives brojo the same SSH ingress he has on fuji: openssh with
+            # password auth off, his authorized key, wheel, and passwordless
+            # sudo for `nixos-rebuild --target-host`.
+            (import ./lib/hosts/server.nix {
+              hostname = "snow";
+              localIP = "192.168.0.53";
+              ethInterface = "enp1s0";
+            })
+
+            # Services running on this host
+            ./lib/services/valheim.nix
+            {
+              services.valheim = {
+                enable = true;
+                serverName = "Sploons";
+                worldName = "forestgump";
+                # Declared inline so that a rebuild+switch is the whole
+                # deployment. This lands in the store and in git;
+                # acceptable for a game server, see lib/services/README.md.
+                password = "onetimeonly";
+                authorizedKeys = [
+                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO//ZN3LvwD7awHobeXg4m89kCP/KJuLvP46OAyxiM8x borja.rojo@gmail.com"
+                ];
+              };
+            }
+
+            # Home manager — brojo as operator, valheim as the service
+            # account's login environment.
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.brojo = import ./lib/users/brojo;
+              home-manager.users.valheim = import ./lib/users/valheim;
             }
           ];
         };

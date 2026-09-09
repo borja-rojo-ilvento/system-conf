@@ -9,7 +9,8 @@
       "Bash(nix flake *)",
       "Bash(sudo arp-scan *)",
       "Bash(sudo nmap *)",
-      "Bash(nix eval *)"
+      "Bash(nix eval *)",
+      "WebFetch(domain:github.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -4,6 +4,10 @@ Per-user Home Manager configurations, intended to be portable across machines.
 
 ## Layout
 
+- `valheim/`
+  - `default.nix` — thin operator shell for the `valheim` service account:
+    zsh plus `vh-*` aliases over the server's units and state directory. The
+    matching system user is declared by `lib/services/valheim.nix`, not here.
 - `brojo/`
   - `default.nix` — root of the user env. Lists user packages and imports
     `./programs`.

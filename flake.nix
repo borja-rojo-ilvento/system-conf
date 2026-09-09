@@ -163,6 +163,52 @@
           ];
         };
 
+        # Bootstrap host. Defined ahead of the hardware being known: the
+        # point is to have something `nixos-anywhere` can install so the box
+        # comes up as a reachable NixOS system, after which it is shaped
+        # further with `nixos-rebuild --target-host`.
+        horn = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            # disko is passed through so the hardware module can import
+            # disko.nixosModules.disko alongside its own disk-config.nix.
+            inherit (inputs) nixos-hardware home-manager disko;
+          };
+          modules = [
+            # Hardware configuration — disk layout is declared by disko;
+            # hardware-configuration.nix is a stub that nixos-anywhere fills
+            # in at install time. Verify disk-config.nix's device path against
+            # the target before installing.
+            ./lib/hardware/machines/horn
+
+            # Host type configuration — headless server flavour. Gives brojo
+            # SSH ingress with his key, wheel, and passwordless sudo, which is
+            # what `nixos-rebuild --target-host` needs afterwards.
+            # ethInterface is UNVERIFIED — assumed to match fuji and snow,
+            # which are both enp1s0. server.nix only pins the static address
+            # when localIP *and* ethInterface are set, so this cannot be
+            # omitted or horn silently falls back to DHCP. Confirm with
+            # `ip link` from the installer USB before running nixos-anywhere:
+            # a wrong name here means the box boots with no route and has to
+            # be fixed with a keyboard attached.
+            (import ./lib/hosts/server.nix {
+              hostname = "horn";
+              localIP = "192.168.0.54";
+              ethInterface = "enp1s0";
+            })
+
+            # No services yet — deliberately. horn earns its payload later.
+
+            # Home manager
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.brojo = import ./lib/users/brojo;
+            }
+          ];
+        };
+
         # Reusable installer ISO. Built once, written to USB, used to bring
         # any new machine to a state where `nixos-anywhere` can kexec into
         # it. Intentionally minimal: no home-manager, no brojo desktop

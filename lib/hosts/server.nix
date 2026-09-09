@@ -52,6 +52,16 @@
 
   networking.firewall.allowedTCPPorts = [ 22 ];
 
+  # Terminal capability database for incoming SSH sessions. The operator's
+  # terminal announces TERM=xterm-ghostty, which is not in the base ncurses
+  # database. brojo happens to resolve it through his home-manager profile
+  # (which installs ghostty), but service accounts have no such profile, so
+  # anything that pages — `systemctl status`, `journalctl` — dies with
+  # "'xterm-ghostty': unknown terminal type". Installing the entry into the
+  # system profile fixes it for every user on the host, not just the ones
+  # with a matching desktop config.
+  environment.systemPackages = [ pkgs.ghostty.terminfo ];
+
   # brojo as the operator user.
   users.users.brojo = {
     isNormalUser = true;

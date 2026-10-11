@@ -67,8 +67,9 @@
     nerd-fonts.jetbrains-mono
     opencode
     # Controller testing tools
-    linuxConsoleTools  # Provides jstest for testing joystick input
-    jstest-gtk         # GUI tool for testing game controllers
+    linuxConsoleTools # Provides jstest for testing joystick input
+    jstest-gtk # GUI tool for testing game controllers
+    stremio-linux-shell
   ];
 
   services.ssh-agent.enable = true;

@@ -36,19 +36,26 @@
   # Display manager and desktop environment
   services = {
     xserver.enable = true;
+
+    # Plasma 6, disabled for now in favor of Cosmic
+    desktopManager.plasma6.enable = false;
     displayManager.sddm = {
-      enable = true;
+      enable = false;
       wayland.enable = true;
     };
-    desktopManager.plasma6.enable = true;
+
+    displayManager.cosmic-greeter.enable = true;
+    desktopManager.cosmic.enable = true;
+    system76-scheduler.enable = true;
+
     dbus.enable = true;
     upower.enable = true;
   };
 
   # KWallet PAM integration
   security.pam.services = {
-    sddm.enableKwallet  = true;
-    sddm.gnupg.enable   = true;
+    sddm.enableKwallet = true;
+    sddm.gnupg.enable = true;
     login.enableKwallet = true;
     passwd.enableKwallet = true;
   };

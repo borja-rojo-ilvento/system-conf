@@ -20,6 +20,7 @@
       heroic
       nemo
       gvfs
+      stremio
     ];
 
     programs = {

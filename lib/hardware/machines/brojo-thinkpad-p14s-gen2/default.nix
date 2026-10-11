@@ -19,13 +19,14 @@
     # The upstream nixos-hardware module already imports common/gpu/nvidia/prime.nix
     # and common/gpu/nvidia/turing, which set videoDrivers = [ "modesetting" ] and
     # default prime.offload.enable = true. We do NOT override videoDrivers here.
+    # nvidia.enabled = false;
     nvidia = {
       modesetting.enable = true;
       powerManagement = {
-        enable = true;       # nvidia-suspend/resume services preserve VRAM across S3.
-        finegrained = true;  # PCIe runtime D3cold when no offloaded client is using the dGPU.
+        enable = true; # nvidia-suspend/resume services preserve VRAM across S3.
+        finegrained = true; # PCIe runtime D3cold when no offloaded client is using the dGPU.
       };
-      open = false;          # T500/Turing: proprietary kept for stability.
+      open = false; # T500/Turing: proprietary kept for stability.
       nvidiaSettings = true;
 
       prime = {
